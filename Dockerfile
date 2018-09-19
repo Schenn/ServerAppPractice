@@ -1,10 +1,10 @@
 FROM node:8
 
-RUN useradd --create-home --shell /bin/bash lohapp
+RUN useradd --create-home --shell /bin/bash app
 
-RUN mkdir -p /home/lohapp/src/
+RUN mkdir -p /home/app/src/
 
-WORKDIR /home/lohapp/src/
+WORKDIR /home/app/src/
 
 COPY . .
 
@@ -13,12 +13,12 @@ RUN apt-get update && \
     openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout ./https/key.pem -out ./https/cert.pem \
         -subj "/C=US/ST=Oregon/L=Portland/O=Schennco/OU=Development/CN=localhost"
 
-RUN chown -R lohapp /home/lohapp/
-RUN chmod 0755 /home/lohapp/
+RUN chown -R app /home/app/
+RUN chmod 0755 /home/app/
 
-USER lohapp
+USER app
 
 EXPOSE 8080
 EXPOSE 8081
 
-CMD ["node", "/home/lohapp/src/index.js"]
+CMD ["node", "/home/app/src/index.js"]
