@@ -30,6 +30,10 @@ const environments = {
 
 
 let env = typeof(process.env.NODE_ENV) === 'string' ? process.env.NODE_ENV.toLowerCase() : 'dev';
+
+/**
+ * @type {environments.dev|{port, https, env}}
+ */
 let currentEnv = typeof(environments[env]) !== "undefined" ? environments[env] : environments.dev;
 
 module.exports = currentEnv;
