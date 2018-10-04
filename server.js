@@ -51,7 +51,7 @@ class Server {
 
     let routeHandle = typeof(this.routes[this.path]) !== "undefined" ?
         this.routes[this.path] :
-        this.notFound.bind(this);
+        {handle: this.notFound.bind(this)};
 
     let data = {
       'path': this.path,
@@ -85,6 +85,24 @@ class Server {
     this[this._].method = req.method;
     this[this._].query = parsed.query;
     this[this._].headers = req.headers;
+
+    let routeHandle = typeof(this.routes[this.path]) !== "undefined" ?
+        this.routes[this.path] :
+        null;
+
+    if(routeHandle) {
+      if(routeHandle.method instanceof Array) {
+        if(!routeHandle.method.includes(this.method)){
+          res.writeHead(405, `Heard invalid method for route: ${this.path} Method Provided: ${this.method} Methods accepted: ${routeHandle.method.join(" ")}`);
+          res.end(null);
+        }
+      } else if (routeHandle.method instanceof String){
+        if(routeHandle.method !== this.method){
+          res.writeHead(405, `Heard invalid method for route: ${this.path} Method Provided: ${this.method} Methods accepted: ${routeHandle.method.join(" ")}`);
+          res.end(null);
+        }
+      }
+    }
 
     // Paydata (form-data), is read as a bitstream
     // Asynchronous Stream reading, have to wait for the end of the stream before you can return a response to the user.

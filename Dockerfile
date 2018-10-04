@@ -21,4 +21,5 @@ USER app
 EXPOSE 8080
 EXPOSE 8081
 
+CMD ["node", "/home/app/src/build.js"]
 CMD ["node", "/home/app/src/index.js"]

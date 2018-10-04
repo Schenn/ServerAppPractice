@@ -2,36 +2,9 @@ const env = require("./config");
 const Server = require("./server");
 const fs = require("fs");
 
-const httpHandlers = {
-  ping: (data, cb)=>{
-    cb(200);
-  }
-};
+const httpRouter = require("./lib/Router").httpRouter;
+const httpsRouter = require('./lib/Router').httpsRouter;
 
-const httpsHandlers = {
-  foo: (data, cb)=>{
-    cb(406, {'response': 'got https foo path'});
-  },
-  ping: (data, cb)=>{
-    cb(200);
-  }
-};
-
-const httpRouter = {
-  'ping': {
-    handle: httpHandlers.ping,
-  }
-};
-
-const httpsRouter = {
-  'foo': {
-    handle: httpsHandlers.foo,
-    type: 'json'
-  },
-  'ping': {
-    handle: httpsHandlers.ping
-  }
-};
 
 const httpEnv = {
   port: env.port,
@@ -48,9 +21,12 @@ let httpServer = new Server(httpRouter);
 httpServer.createServer();
 httpServer.listen(httpEnv);
 
-let httpsServer = new Server(httpsRouter);
-httpsServer.createServer(true, {
-  'key': fs.readFileSync(env.https.key),
-  'cert': fs.readFileSync(env.https.cert)
-});
-httpsServer.listen(httpsEnv);
+if(fs.existsSync('./https/key.cert')){
+  let httpsServer = new Server(httpsRouter);
+  httpsServer.createServer(true, {
+    'key': fs.readFileSync(env.https.key),
+    'cert': fs.readFileSync(env.https.cert)
+  });
+  httpsServer.listen(httpsEnv);
+}
+
