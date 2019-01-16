@@ -47,11 +47,12 @@ class Server {
   }
 
   end(req, res){
+    let notFound = {handle: this.notFound.bind(this)};
     this[this._].buffer += this[this._].decoder.end();
 
     let routeHandle = typeof(this.routes[this.path]) !== "undefined" ?
         this.routes[this.path] :
-        {handle: this.notFound.bind(this)};
+        notFound;
 
     let data = {
       'path': this.path,
@@ -61,24 +62,19 @@ class Server {
       'payload': this[this._].buffer
     };
 
-    if(routeHandle.type === 'json') {
-      routeHandle.handle(data, (status = 200, payload = {}) => {
-        let paydata = JSON.stringify(payload);
-        // set header must be called before write-head, otherwise error
+    routeHandle.handle(data, (status = 200, payload) => {
+      if(routeHandle.type === 'json') {
+        payload = JSON.stringify(payload);
         res.setHeader('content-type', 'application/json');
-        res.writeHead(status);
-        res.end(paydata);
-      });
-    } else {
-      routeHandle.handle(data, (status=200, payload='') =>{
-        res.writeHead(status);
-        res.end(payload);
-      });
-    }
+      }
+
+      res.writeHead(status);
+      res.end(payload);
+    });
   }
 
   handle(req, res){
-// Get the request's path from the request's url string
+    // Get the request's path from the request's url string
     // true argument tells parse function to collect the query string as a query object
     let parsed = url.parse(req.url, true);
     this[this._].path = parsed.pathname.replace(/^\/+|\/+$/g , '');
@@ -90,17 +86,20 @@ class Server {
         this.routes[this.path] :
         null;
 
+    // Validate request's http method against the path's metadata.
     if(routeHandle) {
-      if(routeHandle.method instanceof Array) {
-        if(!routeHandle.method.includes(this.method)){
-          res.writeHead(405, `Heard invalid method for route: ${this.path} Method Provided: ${this.method} Methods accepted: ${routeHandle.method.join(" ")}`);
-          res.end(null);
-        }
-      } else if (routeHandle.method instanceof String){
-        if(routeHandle.method !== this.method){
-          res.writeHead(405, `Heard invalid method for route: ${this.path} Method Provided: ${this.method} Methods accepted: ${routeHandle.method.join(" ")}`);
-          res.end(null);
-        }
+      let error = `Heard invalid method for route: ${this.path} Method Provided: ${this.method} Methods accepted: `;
+      let fail = false;
+      if(routeHandle.method instanceof Array && !routeHandle.method.includes(this.method)) {
+        error += routeHandle.method.join(" ");
+        fail = true;
+      } else if (routeHandle.method instanceof String && routeHandle.method !== this.method){
+        error += routeHandle.method;
+        fail = true;
+      }
+      if(fail){
+        res.writeHead(405, error);
+        res.end(null);
       }
     }
 

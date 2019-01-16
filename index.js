@@ -2,31 +2,24 @@ const env = require("./config");
 const Server = require("./server");
 const fs = require("fs");
 
-const httpRouter = require("./lib/Router").httpRouter;
-const httpsRouter = require('./lib/Router').httpsRouter;
+const routes = require("./lib/Router");
 
+const createServer = function(routers, secure=false){
+  let server = new Server(routers);
+  if(secure && fs.existsSync(env.https.keycert)){
+    server.createServer(true, {
+      'key': fs.readFileSync(env.https.key),
+      'cert': fs.readFileSync(env.https.cert)
+    });
+  } else {
+    server.createServer();
+  }
 
-const httpEnv = {
-  port: env.port,
-  env: env.env
-};
-
-const httpsEnv = {
-  port: env.https.port,
-  env: env.env,
-};
-
-
-let httpServer = new Server(httpRouter);
-httpServer.createServer();
-httpServer.listen(httpEnv);
-
-if(fs.existsSync('./https/key.cert')){
-  let httpsServer = new Server(httpsRouter);
-  httpsServer.createServer(true, {
-    'key': fs.readFileSync(env.https.key),
-    'cert': fs.readFileSync(env.https.cert)
+  server.listen({
+    port: (secure) ? env.https.port : env.port,
+    env: env.env
   });
-  httpsServer.listen(httpsEnv);
-}
+};
 
+createServer(routes.httpRouter);
+createServer(routes.httpsRouter, true);
