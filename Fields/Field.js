@@ -1,9 +1,6 @@
 module.exports = class Field {
-  get Options(){
-    return {};
-  }
 
-  constructor(name){
+  constructor(){
     this._ = Symbol(this.constructor.name);
     this[this._] = {
       name: '',
@@ -11,17 +8,6 @@ module.exports = class Field {
       options: {},
 
     };
-    this[this._].name = name;
-    for(let opt of this.Options) {
-      let option = this.Options[opt];
-      let target = new option.option();
-      if(typeof option.args !== "undefined"){
-        for(let arg of option.args){
-          target[arg] = option.args[arg];
-        }
-      }
-      this[this._].options[opt] = target;
-    }
   }
 
   set value(value){
@@ -33,8 +19,21 @@ module.exports = class Field {
   }
 
   set required(required){
-    if(typeof this[this._].options.required){
+    if(typeof this[this._].options.required !== "undefined"){
       this.getOption("required").is = required;
+    }
+  }
+
+  initOptions(options){
+    for(let opt of options) {
+      let option = options[opt];
+      let target = new option.option();
+      if(typeof option.args !== "undefined"){
+        for(let arg of option.args){
+          target[arg] = option.args[arg];
+        }
+      }
+      this[this._].options[opt] = target;
     }
   }
 

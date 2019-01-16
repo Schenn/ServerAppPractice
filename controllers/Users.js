@@ -1,5 +1,6 @@
 const Controller = require ("../lib/Controller");
 const Writer = require("../lib/Writer");
+const User = require("../Entities/User");
 
 /**
  * @classRoute="u"
@@ -40,14 +41,20 @@ module.exports = class Users extends Controller {
       writer.read('users', phone, (err, data)=>{
         if(err){
           // user doesn't exist. Create.
-          // hash the pass.
-          
+          let user = new User();
+          user.firstName = firstName;
+          user.lastName = lastName;
+          user.username = username;
+          user.tos = tos;
+          user.password = "monkey";
+
+          // Save it to the 'DB'
+
         } else {
           cb(400, {"Error": "A user with that phone number exists."})
         }
       });
-      // Create a new user data object
-      // Save it to the DB
+
     }
   }
 

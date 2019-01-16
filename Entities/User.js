@@ -1,21 +1,18 @@
 const Fields = require("../Fields/");
+const Entity = require("./Entity");
 
-module.exports = class User {
-  constructor(payload){
-    this._ = Symbol(this.constructor.name);
-    this[this._] = {
+module.exports = class User extends Entity {
+  constructor(){
+    super();
+    let fields = {
       username: new Fields.TextField(),
       password: new Fields.HashField(),
       firstName: new Fields.TextField(),
       lastName: new Fields.TextField(),
       tos: new Fields.BoolField()
     };
-
-    this.username = payload.username;
-    this.password = payload.password;
-    this.firstName = payload.firstName;
-    this.lastName = payload.lastName;
-    this.tos = (typeof payload.tos !== "undefined") ? payload.tos : false;
+    fields.tos.requireTrue();
+    this.initFields(fields);
   }
 
   set username(username){
@@ -36,5 +33,23 @@ module.exports = class User {
 
   set tos(tos){
     this[this._].tos.value = tos;
+  }
+
+  get data(){
+    return {
+      username: this.getField("username").value,
+      password: this.getField("password").value,
+      firstName: this.getField("firstName").value,
+      lastName: this.getField("lastName").value,
+      tos: this.getField("tos").value
+    };
+  }
+
+  isValid(){
+    return this.getField("username").isValid() &&
+        this.getField("password").isValid() &&
+        this.getField("firstName").isValid() &&
+        this.getField("lastName").isValid() &&
+        this.getField("tos").isValid();
   }
 };
