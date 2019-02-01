@@ -15,41 +15,43 @@ module.exports = class User extends Entity {
     this.initFields(fields);
   }
 
+  get username(){
+    return this.getField("username").value;
+  }
+
   set username(username){
-    this[this._].username.value = username;
+    this.getField("username").value = username;
+  }
+
+  get password(){
+    return this.getField("password").value;
   }
 
   set password(password){
-    this[this._].password.value = password;
+    this.getField("password").value = password;
+  }
+
+  get firstName(){
+    return this.getField("firstName").value;
   }
 
   set firstName(firstName){
-    this[this._].firstName.value = firstName;
+    this.getField("firstName").value = firstName;
+  }
+
+  get lastName(){
+    return this.getField("lastName").value;
   }
 
   set lastName(lastName){
-    this[this._].lastName.value = lastName;
+    this.getField("lastName").value = lastName;
+  }
+
+  get tos(){
+    return this.getField("tos").value;
   }
 
   set tos(tos){
-    this[this._].tos.value = tos;
-  }
-
-  get data(){
-    return {
-      username: this.getField("username").value,
-      password: this.getField("password").value,
-      firstName: this.getField("firstName").value,
-      lastName: this.getField("lastName").value,
-      tos: this.getField("tos").value
-    };
-  }
-
-  isValid(){
-    return this.getField("username").isValid() &&
-        this.getField("password").isValid() &&
-        this.getField("firstName").isValid() &&
-        this.getField("lastName").isValid() &&
-        this.getField("tos").isValid();
+    this.getField("tos").value = tos;
   }
 };

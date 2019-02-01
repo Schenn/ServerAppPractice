@@ -3,14 +3,14 @@ const Writer = require("../lib/Writer");
 const User = require("../Entities/User");
 
 /**
- * @classRoute="u"
- * @type {module.Users}
+ * @classRoute "u"
+ * @type {Users}
  */
 module.exports = class Users extends Controller {
 
   /**
-   * @route='/'
-   * @param data (should be empty)
+   * @route '/'
+   * @param {object} data (should be empty)
    * @param cb
    */
   index(data, cb){
@@ -18,18 +18,19 @@ module.exports = class Users extends Controller {
   }
 
   /**
-   * @route='create'
-   * @method='post'
+   * @route 'create'
+   * @method 'post'
+   * @entity 'User'
    *
    * @param data
    * @param cb
    */
   create(data, cb){
-    let firstName = typeof data.payload.firstName === 'string' && data.payload.firstName.trim().length > 0 ?
+    let firstName = typeof data.payload.firstName === 'string' ?
         data.payload.firstName.trim() : false;
-    let lastName = typeof data.payload.lastName === 'string' && data.payload.lastName.trim().length > 0 ?
+    let lastName = typeof data.payload.lastName === 'string' ?
         data.payload.lastName.trim() : false;
-    let username = typeof data.payload.userName === 'string' && data.payload.userName.trim().length > 0 ?
+    let username = typeof data.payload.userName === 'string' ?
         data.payload.userName.trim() : false;
     let tos = typeof data.payload.tos === 'boolean' && data.payload.tos === true;
 
@@ -49,6 +50,10 @@ module.exports = class Users extends Controller {
           user.password = "monkey";
 
           // Save it to the 'DB'
+          if(user.isValid()){
+            let data = user.data();
+
+          }
 
         } else {
           cb(400, {"Error": "A user with that phone number exists."})

@@ -3,8 +3,7 @@ const Options = require("./Options/");
 
 const FieldOpts = {
   "length": {option: Options.Size},
-  "type": {option: Options.Text},
-  "required": {option: Options.Required}
+  "type": {option: Options.Text}
 };
 
 module.exports = class TextField extends Field{
@@ -12,6 +11,7 @@ module.exports = class TextField extends Field{
   constructor(){
     super();
     this.initOptions(FieldOpts);
+    this.required = true;
   }
 
   set maxLength(maxLength){
@@ -21,7 +21,7 @@ module.exports = class TextField extends Field{
   set minLength(minLength){
     this.getOption("length").min = minLength;
   }
-  
+
   set pattern(pattern){
     this.getOption("type").pattern = pattern;
   }

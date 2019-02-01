@@ -3,13 +3,13 @@ const Field = require("./Field");
 
 const FieldOpts = {
   "type": {option: Options.Instance, args:{isInstanceOf:Boolean}},
-  "required": {option: Options.Required}
 };
 
 module.exports = class BoolField extends Field {
   constructor(){
     super();
     this.initOptions(FieldOpts);
+    this.required = true;
   }
 
   requireTrue(){

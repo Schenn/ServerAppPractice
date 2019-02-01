@@ -4,13 +4,13 @@ const Options = require("./Options/");
 const FieldOpts = {
   "MinMax":{option: Options.Size},
   "Type": {option: Options.Instance, args: {isInstanceOf: Number}},
-  "Required": {option: Options.Required}
 };
 
 module.exports = class NumericField extends Field{
   constructor(){
     super();
     this.initOptions(FieldOpts);
+    this.required = true;
   }
 
   set max(max){

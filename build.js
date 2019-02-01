@@ -1,5 +1,17 @@
 const RouterCache = require("./lib/RouterCache.js");
+const Writer = require('./lib/Writer.js');
 
-let cache = new RouterCache(".cache");
+let writer = new Writer();
+writer.basePath = ".cache";
+writer.dir = "/routes/";
 
-cache.buildCacheAsync("controllers");
+let cache = new RouterCache();
+cache.buildCacheAsync(path.join(process.cwd(),"controllers"), (routes)=>{
+  writer.delete('routecache.json');
+  writer.append('routecache.json', routes, (err)=>{
+    if(err){
+      console.log(err);
+    }
+  });
+});
+

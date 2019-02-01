@@ -1,3 +1,5 @@
+const Required = require("./Options/Required");
+
 module.exports = class Field {
 
   constructor(){
@@ -19,9 +21,12 @@ module.exports = class Field {
   }
 
   set required(required){
-    if(typeof this[this._].options.required !== "undefined"){
-      this.getOption("required").is = required;
+    if(required && typeof this[this._].options.required === "undefined"){
+      this[this._].options.required = new Required();
+    } else if (!required && typeof this[this._].options.required !== "undefined") {
+      delete this[this._].options.required;
     }
+
   }
 
   initOptions(options){
