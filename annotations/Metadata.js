@@ -34,6 +34,14 @@ module.exports = class Metadata {
     return this[this._].className;
   }
 
+  get extends(){
+    return this[this._].extends;
+  }
+
+  get classDoc(){
+    return this[this._].classDoc;
+  }
+
   get methods(){
     return Object.keys(this[this._].methods);
   }

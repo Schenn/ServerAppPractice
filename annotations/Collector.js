@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Metadata = require("./Metadata");
 
-const isJsFile = /((\.js)$)/g;
+const isJsFile = /((\.js)$)/;
 
 module.exports = class Collector {
 
@@ -39,7 +39,6 @@ module.exports = class Collector {
     // Does the path point to a file or a directory?
     if(isJsFile.test(fullPath)){
       this.collectFromFile(fullPath, cb);
-
     } else {
       // directory
       fs.readdir(fullPath, (err, subpaths)=>{
