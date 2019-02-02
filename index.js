@@ -2,7 +2,7 @@ const env = require("./config");
 const Server = require("./server");
 const fs = require("fs");
 
-const routes = require("./lib/Router");
+const Router = require("./lib/Router");
 
 const createServer = function(routers, secure=false){
   let server = new Server(routers);
@@ -21,5 +21,8 @@ const createServer = function(routers, secure=false){
   });
 };
 
-createServer(routes.httpRouter);
-createServer(routes.httpsRouter, true);
+let router = new Router();
+router.loadFromCache();
+
+createServer(router.httpRoutes);
+createServer(router.httpsRoutes, true);
