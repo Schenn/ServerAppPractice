@@ -3,6 +3,7 @@ const Server = require("./server");
 const fs = require("fs");
 
 const Router = require("./lib/Router");
+const Writer = require("./lib/Writer");
 
 const createServer = function(routers, secure=false){
   let server = new Server(routers);
@@ -22,7 +23,14 @@ const createServer = function(routers, secure=false){
 };
 
 let router = new Router();
-router.loadFromCache();
+let writer = new Writer();
+writer.basePath = ".cache";
+writer.dir = "/routes/";
+
+writer.readSync('routecache.json', true, (data)=>{
+  router.addRoutes(data.httpRoutes);
+  router.addRoutes(data.httpsRoutes, true);
+});
 
 createServer(router.httpRoutes);
 createServer(router.httpsRoutes, true);
