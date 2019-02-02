@@ -1,6 +1,6 @@
-const Controller = require ("../lib/Controller");
-const Writer = require("../lib/Writer");
-const User = require("../Entities/User");
+const Controller = require('../lib/Controller');
+const Writer = require('../lib/Writer');
+const User = require('../Entities/User');
 
 /**
  * @classRoute "u"
@@ -13,8 +13,8 @@ module.exports = class Users extends Controller {
    * @param {object} data (should be empty)
    * @param cb
    */
-  index(data, cb){
-    cb(200, "Success Yo");
+  index(data, cb) {
+    cb(200, 'Success Yo');
   }
 
   /**
@@ -25,38 +25,39 @@ module.exports = class Users extends Controller {
    * @param data
    * @param cb
    */
-  create(data, cb){
+  create(data, cb) {
     let firstName = typeof data.payload.firstName === 'string' ?
         data.payload.firstName.trim() : false;
     let lastName = typeof data.payload.lastName === 'string' ?
         data.payload.lastName.trim() : false;
     let username = typeof data.payload.userName === 'string' ?
         data.payload.userName.trim() : false;
-    let tos = typeof data.payload.tos === 'boolean' && data.payload.tos === true;
+    let tos = typeof data.payload.tos === 'boolean' && data.payload.tos ===
+        true;
 
-    if(!firstName || !lastName || !username || !tos){
-      cb(400, {'Error' : 'Missing Required Fields.'});
+    if (!firstName || !lastName || !username || !tos) {
+      cb(400, {'Error': 'Missing Required Fields.'});
     } else {
       // Make sure user doesn't already exist.
       let writer = new Writer();
-      writer.read('users', phone, (err, data)=>{
-        if(err){
+      writer.read('users', phone, (err, data) => {
+        if (err) {
           // user doesn't exist. Create.
           let user = new User();
           user.firstName = firstName;
           user.lastName = lastName;
           user.username = username;
           user.tos = tos;
-          user.password = "monkey";
+          user.password = 'monkey';
 
           // Save it to the 'DB'
-          if(user.isValid()){
+          if (user.isValid()) {
             let data = user.data();
 
           }
 
         } else {
-          cb(400, {"Error": "A user with that phone number exists."})
+          cb(400, {'Error': 'A user with that phone number exists.'});
         }
       });
 
@@ -70,7 +71,7 @@ module.exports = class Users extends Controller {
    * @param data
    * @param cb
    */
-  update(data, cb){
+  update(data, cb) {
 
   }
 
@@ -80,7 +81,7 @@ module.exports = class Users extends Controller {
    * @param data
    * @param cb
    */
-  delete(data, cb){
+  delete(data, cb) {
 
   }
 
