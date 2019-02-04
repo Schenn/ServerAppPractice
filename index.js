@@ -1,3 +1,4 @@
+const path = require("path");
 const env = require("./config");
 
 const Server = require("./lib/Server");
@@ -12,7 +13,7 @@ const startServer = function(routes){
   router.addRoutes(routes.httpsRoutes, true);
   let server = new Server(router, env.port);
   server.security = env.https;
-  server.createConnections();
+  server.createConnections(env.env);
 };
 
 if(env.env === "prod") {
@@ -22,5 +23,5 @@ if(env.env === "prod") {
   writer.readSync('routecache.json', true, startServer);
 } else {
   let routeCollector = new RouteCollector();
-  routeCollector.buildCache("/controllers/", startServer);
+  routeCollector.buildCache(path.join(process.cwd(),"controllers"), startServer);
 }

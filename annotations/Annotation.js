@@ -1,10 +1,9 @@
-const phraseRegex = /(\w+)(?:\s*=\s*|\s)?(({\w*})(?:\s))?(\S+)/g;
-const nodeRegex = /(\w+)/g;
+const phraseRegex = /(\w+)(?:\s?=\s?|\s)?(({\w*})(?:\s))?(\S+)/g;
 
 module.exports = class Annotation {
   constructor(expression){
     this.phrase = expression.match(phraseRegex)[0];
-    this.nodes = this.phrase.match(nodeRegex);
+    this.nodes = this.phrase.split(" ");
   }
 
   get name(){

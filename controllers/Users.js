@@ -3,13 +3,13 @@ const Writer = require('../lib/Writer');
 const User = require('../Entities/User');
 
 /**
- * @classRoute "u"
+ * @classRoute u
  * @type {Users}
  */
 module.exports = class Users extends Controller {
 
   /**
-   * @route '/'
+   * @route /
    * @param {object} data (should be empty)
    * @param cb
    */
@@ -18,9 +18,9 @@ module.exports = class Users extends Controller {
   }
 
   /**
-   * @route 'create'
-   * @method 'post'
-   * @entity 'User'
+   * @route create
+   * @method post
+   * @entity User
    *
    * @param data
    * @param cb
@@ -65,8 +65,8 @@ module.exports = class Users extends Controller {
   }
 
   /**
-   * @route='update'
-   * @method='put'
+   * @route update
+   * @method put
    *
    * @param data
    * @param cb
@@ -76,8 +76,8 @@ module.exports = class Users extends Controller {
   }
 
   /**
-   * @route='delete'
-   * @method='delete'
+   * @route delete
+   * @method delete
    * @param data
    * @param cb
    */

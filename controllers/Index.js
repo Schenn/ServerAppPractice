@@ -1,12 +1,12 @@
 const Controller = require("../lib/Controller");
 
 /**
- * @classRoute="/"
+ * @classRoute /
  * @type {module.Index}
  */
 module.exports = class Index extends Controller {
   /**
-   * @route="/"
+   * @route /
    *
    * @param data
    * @param cb

@@ -1,11 +1,17 @@
+const path = require("path");
+
+const workingPath = (sub)=>{
+  return path.join(process.cwd(),sub);
+};
+
 const environments = {
   dev: {
     port: 3000,
     https: {
       port: 3001,
-      key: './https/key.pem',
-      cert: './https/cert.pem',
-      keycert: './https/key.cert'
+      key: workingPath('https/key.pem'),
+      cert: workingPath('https/cert.pem'),
+      keycert: workingPath('https/key.cert')
     },
     env: 'dev',
   },
@@ -13,9 +19,9 @@ const environments = {
     port: 5000,
     https: {
       port: 5001,
-      key: './https/key.pem',
-      cert: './https/cert.pem',
-      keycert: './https/key.cert'
+      key: workingPath('https/key.pem'),
+      cert: workingPath('https/cert.pem'),
+      keycert: workingPath('https/key.cert')
     },
     env: 'staging'
   },
@@ -23,9 +29,9 @@ const environments = {
     port: 80,
     https: {
       port: 443,
-      key: './https/key.pem',
-      cert: './https/cert.pem',
-      keycert: './https/key.cert'
+      key: workingPath('https/key.pem'),
+      cert: workingPath('https/cert.pem'),
+      keycert: workingPath('https/key.cert')
     },
     env: 'prod'
   }
