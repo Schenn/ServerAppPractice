@@ -1,4 +1,4 @@
-const Controller = require("../lib/Controller");
+const Controller = require("../Server/Controller");
 
 /**
  * @classRoute /

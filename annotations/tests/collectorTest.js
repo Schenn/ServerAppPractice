@@ -1,6 +1,6 @@
 const path = require("path");
 const assert = require("assert");
-const Collector = require("../annotations/Collector");
+const Collector = require("../Collector");
 
 let mockPath = path.join(process.cwd(), "tests/mocks");
 

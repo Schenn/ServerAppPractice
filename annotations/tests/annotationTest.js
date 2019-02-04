@@ -1,4 +1,4 @@
-const Metadata = require("../annotations/Metadata");
+const Metadata = require("../Metadata");
 const Mock = require("./mocks/Mock");
 const path = require("path");
 const assert = require("assert");

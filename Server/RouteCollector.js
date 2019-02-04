@@ -58,21 +58,19 @@ module.exports = class RouteCollector {
 
           let route = {
             controllerMethod: method,
-            method: httpMethod,
-            controller: data.fileName
+            methodData: methodData,
+            get controller(){
+              return data;
+            }
           };
-
-          if(methodData.hasAnnotation("json")){
-            route.type = "json";
-          }
 
           // Whether or not the route should be secure, add it to the secure router.
           // This way, users who are on a secure connection, who then navigate to an insecure route,
           //  are actually redirected to the secure connection.
 
-          httpsRoutes[routeName] = route;
-
-          if(!secure){
+          if(secure){
+            httpsRoutes[routeName] = route;
+          } else {
             httpRoutes[routeName] = route;
           }
         }

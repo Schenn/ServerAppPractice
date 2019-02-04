@@ -1,4 +1,5 @@
 const cleanRegex = /^\/+|\/+$/g;
+const path = require("path");
 
 module.exports = class Router {
   constructor(){
@@ -48,11 +49,11 @@ module.exports = class Router {
     // Validate request's http method against the path's metadata.
     // if the routeHandle is still null, that's ok, we'll use the notFound method instead.
     if(routeMeta) {
-      if(routeMeta.method instanceof Array && !routeMeta.method.includes(method)) {
-        error += routeMeta.method.join(" ");
+      if(routeMeta.methodData.method instanceof Array && !routeMeta.methodData.method.includes(method)) {
+        error += routeMeta.methodData.method.join(" ");
         fail = true;
-      } else if (routeMeta.method instanceof String && routeMeta.method !== method){
-        error += routeMeta.method;
+      } else if (routeMeta.methodData.method instanceof String && routeMeta.methodData.method !== method){
+        error += routeMeta.methodData.method;
         fail = true;
       }
       if(fail){
@@ -65,11 +66,11 @@ module.exports = class Router {
   handle(data, writeResponse, https=false) {
     let routeMeta = this.routeMeta(data.path, https);
     if (routeMeta != null) {
-      let controllerClass = require(".."+routeMeta.controller);
+      let controllerClass = require(path.join(process.cwd(),routeMeta.controller.fileName));
       let controller = new controllerClass();
       controller[routeMeta.controllerMethod](data, (status = 200, payload) => {
         let headers = [];
-        if (routeMeta.type === 'json') {
+        if (routeMeta.methodData.hasAnnotation("json")) {
           payload = JSON.stringify(payload);
           headers.push({key: 'content-type', value: 'application/json'});
         }

@@ -1,10 +1,10 @@
 const path = require("path");
 const env = require("./config");
 
-const Server = require("./lib/Server");
-const Router = require("./lib/Router");
-const Writer = require("./lib/Writer");
-const RouteCollector = require("./lib/RouteCollector");
+const Server = require("./Server/Server");
+const Router = require("./Server/Router");
+const Writer = require("./Server/Writer");
+const RouteCollector = require("./Server/RouteCollector");
 
 let router = new Router();
 

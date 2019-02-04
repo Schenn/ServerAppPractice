@@ -1,10 +1,14 @@
 module.exports = class Payload {
 
-  constructor(){
+  constructor(bufferData){
     this._ = Symbol("Payload");
     this[this._] = {
+      path: '',
+      method: '',
+      query: '',
+      headers: '',
       props: {},
-      payload: {}
+      payload: bufferData
     };
   }
 

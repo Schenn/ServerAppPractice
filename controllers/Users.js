@@ -1,5 +1,5 @@
-const Controller = require('../lib/Controller');
-const Writer = require('../lib/Writer');
+const Controller = require('../Server/Controller');
+const Writer = require('../Server/Writer');
 const User = require('../Entities/User');
 
 /**
