@@ -1,79 +1,82 @@
-const Collector = require("../annotations/Collector");
+const Collector = require("../NodeAnnotations/Collector");
 
 // Put, post, and delete are all behind https by default.
 const secureMethods = ["PUT", "POST", "DELETE"];
 
-let httpRoutes = {};
-let httpsRoutes = {};
-let controllerPath = "";
-let collector = new Collector();
-
 module.exports = class RouteCollector {
   constructor(){
+    this._ = Symbol("RouteCollector");
+    this[this._] = {
+      httpRoutes:{},
+      httpsRoutes:{},
+      collector: new Collector()
+    };
   }
 
   get routes(){
     return {
-      httpRoutes: httpRoutes,
-      httpsRoutes: httpsRoutes
+      httpRoutes: this[this._].httpRoutes,
+      httpsRoutes: this[this._].httpsRoutes
     };
   }
 
-  get controllerPath(){
-    return controllerPath;
+  get routePath(){
+    return this[this._].collector.filePath;
   }
 
-  set controllerPath(path){
-    controllerPath = path;
+  get collector(){
+    return this[this._].collector;
+  }
+
+  addRoutes(controllerData, classRoute){
+    for(let method of controllerData.methods){
+      let methodData = controllerData.forMethod(method);
+      if(!methodData.hasAnnotation("route")){
+        continue;
+      }
+      let routePath = methodData.getAnnotation("route").value;
+      if(routePath !== "/"){
+        routePath = "/" + routePath;
+      }
+
+      let routeName = (classRoute === "/" && routePath ==="/") ?
+          classRoute :
+          classRoute + routePath;
+
+      let route = {
+        controllerMethod: method,
+        methodData: methodData,
+        get controller(){
+          return controllerData;
+        }
+      };
+
+      let httpMethod = methodData.hasAnnotation("method") ?
+          methodData.getAnnotation("method").value.toUpperCase() :
+          '';
+
+      // Whether or not the route should be secure, add it to the secure router.
+      // This way, static content which doesn't matter will still be delivered whether the user is on
+      //  a secure connection or not.
+
+      if((httpMethod !== "" && secureMethods.includes(httpMethod)) ||
+          methodData.hasAnnotation("httpsOnly")){
+        this[this._].httpsRoutes[routeName] = route;
+      } else {
+        this[this._].httpRoutes[routeName] = route;
+      }
+    }
   }
 
   buildCache(controllerPath, cb){
-    this.controllerPath = controllerPath;
-    collector.collectFromPath(this.controllerPath, ()=>{
-      for(let name of collector.namespaces){
-        let data = collector.classMetadata(name);
-        let classRoute = (data.classDoc.hasAnnotation("classRoute")) ?
-            data.classDoc.getAnnotation("classRoute").value :
-            data.fileName.replace(".js", "");
-        for(let method of data.methods){
-          let methodData = data.forMethod(method);
-          if(!methodData.hasAnnotation("route")){
-            continue;
-          }
-          let routePath = methodData.getAnnotation("route").value;
-          if(routePath !== "/"){
-            routePath = "/" + routePath;
-          }
+    this.collector.collectFromPath(controllerPath, ()=>{
+      for(let name of this.collector.namespaces){
+        let controller = this.collector.classMetadata(name);
+        let classRoute = (controller.classDoc.hasAnnotation("classRoute")) ?
+            controller.classDoc.getAnnotation("classRoute").value :
+            name.replace(controllerPath, "");
 
-          let routeName = (classRoute === "/" && routePath ==="/") ?
-              classRoute :
-              classRoute + routePath;
-
-          let httpMethod = methodData.hasAnnotation("method") ?
-              methodData.getAnnotation("method").value.toUpperCase() :
-              '';
-
-          let secure = (httpMethod !== "" && secureMethods.includes(httpMethod)) ||
-              methodData.hasAnnotation("httpsOnly");
-
-          let route = {
-            controllerMethod: method,
-            methodData: methodData,
-            get controller(){
-              return data;
-            }
-          };
-
-          // Whether or not the route should be secure, add it to the secure router.
-          // This way, users who are on a secure connection, who then navigate to an insecure route,
-          //  are actually redirected to the secure connection.
-
-          if(secure){
-            httpsRoutes[routeName] = route;
-          } else {
-            httpRoutes[routeName] = route;
-          }
-        }
+        this.addRoutes(controller, classRoute);
 
       }
       cb(this.routes);
