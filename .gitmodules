@@ -1,0 +1,3 @@
+[submodule "NodeAnnotations"]
+	path = NodeAnnotations
+	url = https://github.com/Schenn/NodeAnnotations.git
