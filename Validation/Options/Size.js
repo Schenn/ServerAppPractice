@@ -8,17 +8,14 @@ module.exports = class Size extends Option {
     this.max = 0;
   }
 
-  isValid(value){
+  isValid(value) {
     let size = (typeof value === "number") ?
         value :
         value.length;
 
-    if(this.min > 0 && size < this.min){
+    if (this.min > 0 && size < this.min) {
       return false;
     }
-    if(this.max > 0 && size > this.max){
-      return false;
-    }
-    return true;
+    return !(this.max > 0 && size > this.max);
   }
 };

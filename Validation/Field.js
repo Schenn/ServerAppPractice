@@ -47,7 +47,7 @@ module.exports = class Field {
   }
 
   isValid(){
-    let valid = true;
+    let valid;
     for(let opt of this[this._].options){
       let option = this[this._].options[opt];
       valid = option.isValid(this.value);

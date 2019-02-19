@@ -1,6 +1,6 @@
 const Controller = require('../Server/Controller');
-const Writer = require('../Server/Writer');
-const User = require('../Entities/User');
+const Writer = require('../lib/Writer');
+const User = require('../Entities_old/User');
 
 /**
  * @classRoute u

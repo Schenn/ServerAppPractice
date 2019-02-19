@@ -13,7 +13,7 @@ module.exports = class Entity {
   }
 
   isValid(){
-    let valid = true;
+    let valid;
     for(let field of this[this._]){
       valid = this[this._][field].isValid();
       if(!valid){

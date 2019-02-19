@@ -1,57 +1,77 @@
-const Fields = require("../Fields/");
-const Entity = require("./Entity");
 
-module.exports = class User extends Entity {
+module.exports = class User {
+
   constructor(){
-    super();
-    let fields = {
-      username: new Fields.TextField(),
-      password: new Fields.HashField(),
-      firstName: new Fields.TextField(),
-      lastName: new Fields.TextField(),
-      tos: new Fields.BoolField()
+    this._ = Symbol("user");
+    this[this._] = {
+      firstName: '',
+      lastName: '',
+      username: '',
+      password: '',
     };
-    fields.tos.requireTrue();
-    this.initFields(fields);
   }
 
-  get username(){
-    return this.getField("username").value;
-  }
-
-  set username(username){
-    this.getField("username").value = username;
-  }
-
-  get password(){
-    return this.getField("password").value;
-  }
-
-  set password(password){
-    this.getField("password").value = password;
-  }
-
+  /**
+   * @return {string}
+   */
   get firstName(){
-    return this.getField("firstName").value;
+    return this[this._].firstName;
   }
 
-  set firstName(firstName){
-    this.getField("firstName").value = firstName;
+  /**
+   * @validator {TextField} required
+   * @param {string} name
+   */
+  set firstName(name){
+    this[this._].firstName = name;
   }
 
+  /**
+   * @return {string}
+   */
   get lastName(){
-    return this.getField("lastName").value;
+    return this[this._].lastName;
   }
 
-  set lastName(lastName){
-    this.getField("lastName").value = lastName;
+  /**
+   * @validator {TextField} required
+   * @param {string} name
+   */
+  set lastName(name){
+    this[this._].lastName = name;
   }
 
-  get tos(){
-    return this.getField("tos").value;
+  /**
+   * @return {string}
+   */
+  get username(){
+    return this[this._].username;
   }
 
-  set tos(tos){
-    this.getField("tos").value = tos;
+  /**
+   * @validator {TextField} required
+   * @db:constraint unique
+   *
+   * @param {string} username
+   */
+  set username(username){
+    this[this._].username = name;
   }
+
+  /**
+   * @return {string}
+   */
+  get password(){
+    return this[this._].password;
+  }
+
+  /**
+   * @field hash
+   * @validator {HashField} required
+   * @param {string} password
+   */
+  set password(password){
+    this[this._].password = password;
+  }
+
 };

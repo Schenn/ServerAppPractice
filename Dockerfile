@@ -1,4 +1,4 @@
-FROM node:9
+FROM node:10
 
 RUN useradd --create-home --shell /bin/bash app
 
@@ -9,7 +9,8 @@ WORKDIR /home/app/src/
 COPY . .
 
 RUN apt-get update && \
-    apt-get install -y openssl apt-utils && \
+    apt-get install -y apt-utils && \
+    apt-get install -y openssl && \
     openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout ./https/key.pem -out ./https/cert.pem \
         -subj "/C=US/ST=Oregon/L=Portland/O=Schennco/OU=Development/CN=localhost"
 
@@ -21,6 +22,4 @@ USER app
 EXPOSE 8080
 EXPOSE 8081
 
-
-#RUN "node ./index.js"
 CMD ["node", "./index.js"]

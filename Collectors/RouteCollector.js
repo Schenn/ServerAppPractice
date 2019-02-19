@@ -3,14 +3,12 @@ const Collector = require("../NodeAnnotations/Collector");
 // Put, post, and delete are all behind https by default.
 const secureMethods = ["PUT", "POST", "DELETE"];
 
-module.exports = class RouteCollector {
+module.exports = class RouteCollector extends Collector {
+
   constructor(){
-    this._ = Symbol("RouteCollector");
-    this[this._] = {
-      httpRoutes:{},
-      httpsRoutes:{},
-      collector: new Collector()
-    };
+    super();
+    this[this._].httpRoutes = {};
+    this[this._].httpsRoutes = {};
   }
 
   get routes(){
@@ -20,14 +18,6 @@ module.exports = class RouteCollector {
     };
   }
 
-  get routePath(){
-    return this[this._].collector.filePath;
-  }
-
-  get collector(){
-    return this[this._].collector;
-  }
-
   addRoutes(controllerData, classRoute){
     for(let method of controllerData.methods){
       let methodData = controllerData.forMethod(method);
@@ -35,18 +25,23 @@ module.exports = class RouteCollector {
         continue;
       }
       let routePath = methodData.getAnnotation("route").value;
-      if(routePath !== "/"){
+      if(routePath === ''){
+        routePath = method.toLowerCase();
+      }
+      if(routePath[0] !== "/"){
         routePath = "/" + routePath;
       }
 
-      let routeName = (classRoute === "/" && routePath ==="/") ?
-          classRoute :
-          classRoute + routePath;
+      let routeName = '';
+      if(classRoute !== "/"){
+        routeName += classRoute;
+      }
+      routeName += routePath;
 
       let route = {
         controllerMethod: method,
         methodData: methodData,
-        get controller(){
+        get controllerData(){
           return controllerData;
         }
       };
@@ -69,17 +64,16 @@ module.exports = class RouteCollector {
   }
 
   buildCache(controllerPath, cb){
-    this.collector.collectFromPath(controllerPath, ()=>{
-      for(let name of this.collector.namespaces){
-        let controller = this.collector.classMetadata(name);
-        let classRoute = (controller.classDoc.hasAnnotation("classRoute")) ?
-            controller.classDoc.getAnnotation("classRoute").value :
-            name.replace(controllerPath, "");
+    this.onFileParsed = (controller, namespace)=>{
+      let classRoute = (controller.classDoc.hasAnnotation("classRoute")) ?
+        controller.classDoc.getAnnotation("classRoute").value :
+        namespace.toLowerCase();
 
-        this.addRoutes(controller, classRoute);
-
-      }
+      this.addRoutes(controller, classRoute);
+    };
+    this.onComplete = ()=>{
       cb(this.routes);
-    });
+    };
+    this.collectFromPath(controllerPath);
   }
 };

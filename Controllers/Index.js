@@ -2,7 +2,7 @@ const Controller = require("../Server/Controller");
 
 /**
  * @classRoute /
- * @type {module.Index}
+ * @type {Index}
  */
 module.exports = class Index extends Controller {
   /**
