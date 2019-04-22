@@ -5,6 +5,11 @@ const Server = require("./Server/Server");
 const Router = require("./Server/Router");
 const RouteCollector = require("./Collectors/RouteCollector");
 
+/**
+ * Create a server and start listening for connections.
+ *
+ * @param {Router} router
+ */
 const startServer = function(router){
   let server = new Server(router);
   server.environment = env.env;

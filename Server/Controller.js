@@ -28,41 +28,6 @@ module.exports = class Controller {
 
   constructor() {
     this[_] = {
-      onRoutePost = {}
     };
-  }
-
-  createResponse(status = 200, payload = '', headers = []){
-    return new Response(status, payload, headers);
-  }
-
-  /**
-   * Add a callback which takes the post data and does work to it before the payload reaches the destination route.
-   *  e.g. Data validation, field adjustments, db lookups
-   * @param {string} route
-   * @param {function} onPostCb
-   */
-  routePayload(route, onPostCb){
-    this[_].routePayload[route] = onPostCb;
-  }
-
-  /**
-   * Get the payload for a post/put/delete request
-   *  If no callback is set, then the data is untouched.
-   *
-   * @param route
-   * @param postData
-   * @return {*}
-   */
-  getRoutePayload(route, postData){
-    let cb;
-    if(typeof this[_].routePayload[route] !== "undefined") {
-      cb = this[_].routePayload[route];
-    } else {
-      cb = (postData)=>{
-        return postData;
-      };
-    }
-    return cb(postData);
   }
 };

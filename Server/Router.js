@@ -16,6 +16,11 @@ module.exports = class Router {
     };
   }
 
+  /**
+   * Add a route to the router.
+   *
+   * @param {Route} route
+   */
   addRoute(route){
     let httpMethods = route.httpMethod;
     if(httpMethods instanceof Array){
@@ -33,7 +38,6 @@ module.exports = class Router {
    * Add a collection of routes to the routemaps.
    *
    * @param {array} routes
-   *
    */
   addRoutes(routes){
     for(let route in routes){
@@ -44,6 +48,7 @@ module.exports = class Router {
   /**
    * Get the data object for a given route.
    *
+   * @param {Request} req The request object.
    * @return {Object}
    */
   routeMeta(req){
@@ -57,6 +62,8 @@ module.exports = class Router {
   /**
    * Get the controller for the given path and trigger the matching route handler.
    *
+   * @param {Request} req
+   * @param {Response} res
    */
   handle(req, res) {
     let route = this.routeMeta(req);

@@ -1,4 +1,3 @@
-const StringDecoder = require("string_decoder").StringDecoder;
 const Connection = require("./Connection");
 const SecureConnection = require("./SecureConnection");
 const Request = require("./Request");
@@ -13,6 +12,8 @@ class Server {
   /**
    * Create a raw server to host connections from.
    *  You must provide a class that knows how to take a route and do something with it.
+   *
+   * @param {Router} router The router class which handles routing incoming requests to the appropriate methods.
    */
   constructor(router){
     this[_] = {
@@ -20,13 +21,13 @@ class Server {
       logger: console,
       connections: [],
       environment: '',
-      decoder: new StringDecoder('utf-8'),
     };
   }
 
   /**
-   * For logging
-   * @param environment
+   * Memoize the current environment for logging.
+   *
+   * @param {String | Object} environment
    */
   set environment(environment){
     this[_].environment = environment;
@@ -43,7 +44,7 @@ class Server {
 
   /**
    * Create an http connection
-   * @param {number} port
+   * @param {number} port The port to listen on.
    * @param {string|null} key path to the SSH key.
    */
   createConnection(port, key = null){
@@ -51,7 +52,7 @@ class Server {
       let request = new Request(req, !!key);
       let response = new Response(res);
       try {
-        req.process(()=>{
+        req.init(()=>{
           this[_].router.handle(request, response);
         });
       } catch(e){
@@ -69,7 +70,4 @@ class Server {
   }
 }
 
-/**
- * Create a server and provide it with a request handling callback
- */
 module.exports = Server;

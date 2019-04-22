@@ -13,14 +13,19 @@ module.exports = class RouteCollector extends Collector {
     this[_].router = new Router();
   }
 
-  get routes(){
-    return this[_].routes;
-  }
-
+  /**
+   * Add a route to the router.
+   * @param {Route} route
+   */
   addRoute(route){
     this[_].router.addRoute(route);
   }
 
+  /**
+   * Collect the methods from a controller and memoize any routes found.
+   *
+   * @param {Object} controllerData
+   */
   addRoutes(controllerData){
     if(!controllerData.classDoc.hasAnnotation("classRoute")){
       controllerData.classDoc.addAnnotation(`@classRoute ${namespace.toLowerCase()}`);
@@ -36,6 +41,12 @@ module.exports = class RouteCollector extends Collector {
     }
   }
 
+  /**
+   * Collect the controllers found on a given path and identify the routes that belong to it.
+   *
+   * @param {String} controllerPath The parent directory for your controllers
+   * @param {function} cb The callback to trigger when all the controllers have been processed.
+   */
   buildCache(controllerPath, cb){
     this.onFileParsed = (controllerData, namespace) => {
       if(!controllerData.classDoc.hasAnnotation("classRoute")){

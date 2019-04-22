@@ -3,17 +3,23 @@ const https = require("https");
 const _ = Symbol("private");
 
 module.exports = class SecureConnection extends Connection {
-  constructor(port, handler) {
-    super();
+  /**
+   * @param {number} port
+   * @param {function} handler
+   * @param {string} key
+   */
+  constructor(port, handler, key) {
+    super(port, handler);
     this[_] = {
-      key: ''
+      key: fs.readFileSync(key)
     };
   }
 
-  set key(key){
-    this[_].key =  fs.readFileSync(key);
-  }
-
+  /**
+   * Start listening for connections.
+   *
+   * @param onListening
+   */
   open(onListening = null){
     if(!onListening){
       onListening = ()=>{console.log(`Secure Connection created on port: ${this[_].port}`)};
