@@ -1,4 +1,5 @@
 const _ = Symbol("private");
+const Response = require("./Response");
 
 /**
  * Controller is the base class used by the server controller classes.
@@ -29,6 +30,10 @@ module.exports = class Controller {
     this[_] = {
       onRoutePost = {}
     };
+  }
+
+  createResponse(status = 200, payload = '', headers = []){
+    return new Response(status, payload, headers);
   }
 
   /**

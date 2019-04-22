@@ -1,40 +1,32 @@
 const Emitter = require("events");
 const http = require("http");
+const fs = require("fs");
 
 const _ = Symbol("private");
 
 module.exports = class Connection extends Emitter {
-  constructor(port) {
+  constructor(port, handler) {
     super();
     this[_] = {
       port: port,
-      routeHandle: null,
-      server: null
-    };
-    this.__ = Symbol("protected");
-    this[this.__] = {
-      get routeHandler(){
-        return this[_].routeHandle
-      },
-      set server(server){
-        this[_].server = server;
-        this[_].server.listen(this[_].port);
-      },
-      get server(){
-        return this[_].server;
-      }
+      handler: handler,
+      server: null,
     };
   }
 
-  set routeHandler(handler){
-    this[_].routeHandle = handler;
+  get handler(){
+    return this[_].handler;
   }
 
   get port(){
     return this[_].port;
   }
 
-  listen(){
-    this[this.__].server = http.createServer(this[_].routeHandle);
+  open(onListening = null){
+    if(!onListening){
+      onListening = ()=>{console.log(`Connection created on port: ${this[_].port}`)};
+    }
+    this[_].server = http.createServer(this.handler);
+    this[_].server.listen(this[_].port, onListening);
   }
 };

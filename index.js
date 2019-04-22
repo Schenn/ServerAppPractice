@@ -3,25 +3,15 @@ const env = require("./config");
 
 const Server = require("./Server/Server");
 const Router = require("./Server/Router");
-const Writer = require("./Server/Writer");
-const RouteCollector = require("./Server/RouteCollector");
+const RouteCollector = require("./Collectors/RouteCollector");
 
-let router = new Router();
-
-const startServer = function(routes){
-  router.addRoutes(routes.httpRoutes);
-  router.addRoutes(routes.httpsRoutes, true);
-  let server = new Server(router, env.port);
-  server.security = env.https;
-  server.createConnections(env.env);
+const startServer = function(router){
+  let server = new Server(router);
+  server.environment = env.env;
+  server.createConnection(env.port);
+  server.createConnection(env.https.port, env.https.key);
 };
 
-if(env.env === "prod") {
-  let writer = new Writer();
-  writer.basePath = ".cache";
-  writer.dir = "/routes/";
-  writer.readSync('routecache.json', true, startServer);
-} else {
-  let routeCollector = new RouteCollector();
-  routeCollector.buildCache(path.join(process.cwd(),"controllers"), startServer);
-}
+let routeCollector = new RouteCollector();
+routeCollector.buildCache(path.join(process.cwd(),"Controllers"), startServer);
+

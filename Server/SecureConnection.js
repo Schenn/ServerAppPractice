@@ -1,41 +1,24 @@
-const Emitter = require("events");
-const http = require("http");
+const Connection = require("./Connection");
 const https = require("https");
-const fs = require("fs");
-
 const _ = Symbol("private");
 
-module.exports = class Connection extends Emitter {
+module.exports = class SecureConnection extends Connection {
   constructor(port, handler) {
     super();
     this[_] = {
-      port: port,
-      handler: handler,
-      server: null,
       key: ''
     };
-  }
-
-  get handler(){
-    return this[_].handler;
-  }
-
-  get port(){
-    return this[_].port;
   }
 
   set key(key){
     this[_].key =  fs.readFileSync(key);
   }
 
-  isSecure(){
-    return this[_].key !== '';
-  }
-
-  open(onListening){
-    this[_].server = this.isSecure() ?
-      https.createServer(this[_].key, this.handler) :
-      http.createServer(this.handler);
+  open(onListening = null){
+    if(!onListening){
+      onListening = ()=>{console.log(`Secure Connection created on port: ${this[_].port}`)};
+    }
+    this[_].server = https.createServer(this[_].key, this.handler);
     this[_].server.listen(this[_].port, onListening);
   }
 };

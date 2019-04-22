@@ -11,7 +11,7 @@ module.exports = class Index extends Controller {
    * @param data
    * @param cb
    */
-  index(data, cb){
-    cb(200, "Index index index index");
+  index(req, res){
+    res.content = "index index index index";
   }
 };

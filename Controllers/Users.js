@@ -14,13 +14,17 @@ module.exports = class Users extends Controller {
    * @param cb
    */
   index(data, cb) {
-    cb(200, 'Success Yo');
+    cb(this.createResponse(200, 'Success Yo'));
+  }
+
+  validateUser(payload){
+
   }
 
   /**
    * @route create
    * @method post
-   * @entity User
+   * @beforeRoute validateUser
    *
    * @param data
    * @param cb
@@ -36,7 +40,7 @@ module.exports = class Users extends Controller {
         true;
 
     if (!firstName || !lastName || !username || !tos) {
-      cb(400, {'Error': 'Missing Required Fields.'});
+      cb(this.createResponse(400, {'Error': 'Missing Required Fields.'}));
     } else {
       // Make sure user doesn't already exist.
       let writer = new Writer();
@@ -57,7 +61,7 @@ module.exports = class Users extends Controller {
           }
 
         } else {
-          cb(400, {'Error': 'A user with that phone number exists.'});
+          cb(this.createResponse(400, {'Error': 'A user with that phone number exists.'}));
         }
       });
 
