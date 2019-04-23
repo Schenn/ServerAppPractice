@@ -117,7 +117,7 @@ module.exports = class Route {
    *
    *  Use doBefore to pass the request / response into another (class and ) method.
    *    for example: process the incoming data for a post against a validator.
-   *    
+   *
    * @return {string}
    */
   get doBefore(){
@@ -155,7 +155,16 @@ module.exports = class Route {
    */
   handle(req, res){
     let controller = this.controller;
-
+    if(route.doBefore !== ''){
+      if(route.doBefore.indexOf("\\") === -1){
+        controller[route.doBefore](req, res);
+      } else {
+        let doBefore = route.doBefore.split("::");
+        let targetClass = Autoloader(doBefore[0]);
+        let target = new targetClass();
+        target[doBefore[1]](req, res);
+      }
+    }
     controller[route.controllerMethod](req, res);
     if (this[_].routeData.hasAnnotation("json")) {
       res.content = JSON.stringify(res.content);
