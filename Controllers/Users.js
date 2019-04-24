@@ -23,8 +23,8 @@ module.exports = class Users extends Controller {
 
   /**
    * @route create
-   * @method post
-   * @beforeRoute validateUser
+   * @httpMethod post
+   * @doBefore validateUser
    *
    * @param data
    * @param cb

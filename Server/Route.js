@@ -30,15 +30,15 @@ const validateHttpMethod = (req, httpMethod)=>{
 module.exports = class Route {
 
   /**
-   * @param {Object} controllerData
+   * @param {Metadata} controllerData
    * @param {string} method
    * @return {*}
    */
   constructor(controllerData, method){
     this[_] = {
-      get method(){ return method;},
-      get controllerData(){ return controllerData;},
-      get routeData(){ return controllerData.forMethod(method);}
+      method: method,
+      controllerData: controllerData,
+      routeData: controllerData.forMethod(method)
     };
   }
 
@@ -48,7 +48,8 @@ module.exports = class Route {
    * @return {string}
    */
   get controllerRoute(){
-    return this[_].controllerData.getAnnotation("classRoute").value;
+    console.log(this[_].controllerData.classDoc.getAnnotation("classRoute"));
+    return this[_].controllerData.classDoc.getAnnotation("classRoute").value;
   }
 
   /**
@@ -108,8 +109,8 @@ module.exports = class Route {
    * @return {string}
    */
   get httpMethod(){
-    return this[_].routeData.hasAnnotation("method") ?
-      this[_].routeData.getAnnotation("method").value.toUpperCase() : "GET";
+    return this[_].routeData.hasAnnotation("httpMethod") ?
+      this[_].routeData.getAnnotation("httpMethod").value.toUpperCase() : "GET";
   }
 
   /**
