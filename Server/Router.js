@@ -10,7 +10,7 @@ const _ = Symbol("private");
  * @type {Router}
  */
 module.exports = class Router {
-  constructor(controllerPath = 'Controllers'){
+  constructor(){
     this[_] = {
       routes:{}
     };
@@ -22,16 +22,12 @@ module.exports = class Router {
    * @param {Route} route
    */
   addRoute(route){
-    let httpMethods = route.httpMethod;
-    if(httpMethods instanceof Array){
-      for(let method of httpMethods){
-        let routePath = `${method}::${route.routePath.replace(cleanRegex, '')}`;
-        this[_].routes[routePath] = route;
-      }
-    } else {
-      let routePath = `${httpMethods}::${route.routePath.replace(cleanRegex, '')}`;
-      this[_].routes[routePath] = route;
+    let cleanPath = route.routePath.replace(cleanRegex, '');
+    if(cleanPath === ''){
+      cleanPath = "/";
     }
+    let routePath = `${route.httpMethod}::${cleanPath}`;
+    this[_].routes[routePath] = route;
   }
 
   /**
@@ -52,8 +48,11 @@ module.exports = class Router {
    * @return {Object}
    */
   routeMeta(req){
-    let method = req.httpMethod;
-    let path = `${method}::${req.path}`;
+    let cleanPath = req.path.replace(cleanRegex, '');
+    if(cleanPath === ''){
+      cleanPath = "/";
+    }
+    let path = `${req.httpMethod}::${cleanPath}`;
     return this[_].routes[path] ?
       this[_].routes[path] :
       null;
