@@ -88,6 +88,14 @@ const testValidateBadRequest = (route, meta)=>{
   }
 };
 
+/**
+ * Test that the route can handle sending the request to the appropriate handlers
+ *  Also test that the model is set on any methods requiring a model
+ *  Also test that the doBefore method is triggered before the handler is triggered.
+ *  Also test that if the content should be json, it is converted to json and the json header is set.
+ * @param route
+ * @param methodMeta
+ */
 const testHandle = (route, methodMeta)=>{
   let req ={hit: false, doBefore:false, payload: 'test'};
   let res = {headers:[], content: '', modelTest: '',
