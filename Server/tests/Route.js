@@ -9,7 +9,17 @@ let mockOtherController = path.join(process.cwd(), "mocks/MockOtherController.js
 let indexMeta = new Metadata();
 let otherMeta = new Metadata();
 
-const testRoutePaths = (route, meta, method, controllerRoute)=>{
+/**
+ * Test that the route paths output as expected
+ *  controllerRoute: controller.classRoute
+ *  subpath: /method.route
+ *  routePath: controller.classRoute/method.route
+ *
+ * @param route
+ * @param method
+ * @param controllerRoute
+ */
+const testRoutePaths = (route, method, controllerRoute)=>{
   // for the test classes, the route looks like : route: "method", controller method: "testMethod".
   let methodToRoute = method.replace("test","").toLowerCase();
 
@@ -31,6 +41,13 @@ const testRoutePaths = (route, meta, method, controllerRoute)=>{
   }
 };
 
+/**
+ * Test that the route does not throw if the request parameters match the method requirements
+ *  e.g. require httpMethod: POST, connection must be https.
+ *
+ * @param route
+ * @param meta
+ */
 const testValidateGoodRequest=(route, meta)=>{
   assert.doesNotThrow(()=>{
     let routeMethod = meta.hasAnnotation("httpMethod") ? meta.getAnnotation("httpMethod")[0].value.toUpperCase() : "GET";
@@ -43,17 +60,24 @@ const testValidateGoodRequest=(route, meta)=>{
   });
 };
 
+/**
+ * Test that the route DOES throw if the provided http method or connection does not meet the method requirements.
+ *
+ * @param route
+ * @param meta
+ */
 const testValidateBadRequest = (route, meta)=>{
   let routeMethod = meta.hasAnnotation("httpMethod") ? meta.getAnnotation("httpMethod")[0].value.toUpperCase() : "GET";
   let isSecure = !((routeMethod === "GET" && meta.hasAnnotation("https")) || routeMethod !== "GET");
   if(!isSecure){
+    // test the secure connection check
     assert.throws(()=>{
       route.validateRequest({
         isSecure: ()=>{return isSecure;},
         httpMethod: routeMethod
       });
     });
-
+    // http method check
     assert.throws(()=>{
       let alternateMethod = (routeMethod === 'POST') ? "PUT": 'POST';
       route.validateRequest({
@@ -62,12 +86,6 @@ const testValidateBadRequest = (route, meta)=>{
       });
     });
   }
-
-};
-
-const testValidateRequest = (route, meta)=>{
-  testValidateGoodRequest(route, meta);
-  testValidateBadRequest(route, meta);
 };
 
 const testHandle = (route, methodMeta)=>{
@@ -94,8 +112,9 @@ let test = (meta, controllerRoute)=>{
         assert.throws(()=>{let route = new Route(meta, method);});
       } else {
         let route = new Route(meta, method);
-        testRoutePaths(route, meta, method, controllerRoute);
-        testValidateRequest(route, methodMeta);
+        testRoutePaths(route, method, controllerRoute);
+        testValidateGoodRequest(route, methodMeta);
+        testValidateBadRequest(route, methodMeta);
         testHandle(route, methodMeta);
       }
     }
