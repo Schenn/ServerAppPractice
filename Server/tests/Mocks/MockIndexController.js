@@ -2,40 +2,42 @@ const Controller = require("../../Controller");
 
 /**
  * @classRoute /
- * @type {MockController}
+ * @type {MockIndexController}
  */
-module.exports = class MockController extends Controller {
+module.exports = class MockIndexController extends Controller {
   /**
    * @route /
    *
    * @param data
    * @param cb
    */
-  index(req, res){
+  testIndex(req, res){
+    req.hit = true;
     res.content = "index index index index";
   }
 
   /**
    * @route save
    * @httpMethod post
-   *
+   * @json
    * @param req
    * @param res
    */
-  testPost(req, res){
-
+  testSave(req, res){
+    req.hit = true;
+    res.content = {'test':'test'};
   }
 
   /**
    * @route update
    * @httpMethod put
-   * @doBefore tests\Mocks\MockHandler::doThing
+   * @doBefore Mocks\MockHandler::doThing
    *
    * @param req
    * @param res
    */
   testUpdate(req, res){
-
+    req.hit = true;
   }
 
   /**
@@ -46,7 +48,7 @@ module.exports = class MockController extends Controller {
    * @param res
    */
   testDelete(req, res){
-
+    req.hit = true;
   }
 
   /**
@@ -54,6 +56,6 @@ module.exports = class MockController extends Controller {
    * @param res
    */
   doThing(req, res){
-
+    req.doBefore = true;
   }
 };

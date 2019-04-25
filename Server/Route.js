@@ -1,3 +1,4 @@
+const Autoloader = require("./Autoloader");
 const _ = Symbol("private");
 const secureMethods = ["PUT", "POST", "DELETE"];
 
@@ -9,7 +10,7 @@ const secureMethods = ["PUT", "POST", "DELETE"];
  */
 const validateSecureRequest = (req, routeIsSecure)=>{
   if(routeIsSecure && !req.isSecure()){
-    throw `Route requires a secure connection. Connection is insecure.`;
+    throw new Error(`Route requires a secure connection. Connection is insecure.`);
   }
 };
 
@@ -22,8 +23,8 @@ const validateSecureRequest = (req, routeIsSecure)=>{
 const validateHttpMethod = (req, httpMethod)=>{
   if((httpMethod instanceof Array && !httpMethod.includes(req.httpMethod)) ||
     (httpMethod instanceof String && httpMethod !== req.httpMethod)){
-    throw `Heard invalid method for route: ${req.path} Method Provided: 
-        ${req.httpMethod} Methods accepted: ${httpMethod}`;
+    throw new Error(`Heard invalid method for route: ${req.path} Method Provided: 
+        ${req.httpMethod} Methods accepted: ${httpMethod}`);
   }
 };
 
@@ -35,6 +36,10 @@ module.exports = class Route {
    * @return {*}
    */
   constructor(controllerData, method){
+    let meta = controllerData.forMethod(method);
+    if(!meta.hasAnnotation("route")){
+      throw `No route provided in method data for controller ${controllerData.className} method: ${method}`;
+    }
     this[_] = {
       method: method,
       controllerData: controllerData,
@@ -48,8 +53,7 @@ module.exports = class Route {
    * @return {string}
    */
   get controllerRoute(){
-    console.log(this[_].controllerData.classDoc.getAnnotation("classRoute"));
-    return this[_].controllerData.classDoc.getAnnotation("classRoute").value;
+    return this[_].controllerData.classDoc.getAnnotation("classRoute")[0].value;
   }
 
   /**
@@ -58,7 +62,7 @@ module.exports = class Route {
    * @return {string}
    */
   get subpath(){
-    let routePath = this[_].routeData.getAnnotation("route").value;
+    let routePath = this[_].routeData.getAnnotation("route")[0].value;
     if(routePath[0] !== "/"){
       routePath = "/" + routePath;
     }
@@ -98,9 +102,7 @@ module.exports = class Route {
    * @return {string}
    */
   get routePath(){
-    let controllerRoute = this.controllerRoute;
-    let subpath = this.subpath;
-    return (controllerRoute + subpath).replace("//", "/");
+    return (`${this.controllerRoute}${this.subpath}`).replace("//", "/");
   }
 
   /**
@@ -110,7 +112,7 @@ module.exports = class Route {
    */
   get httpMethod(){
     return this[_].routeData.hasAnnotation("httpMethod") ?
-      this[_].routeData.getAnnotation("httpMethod").value.toUpperCase() : "GET";
+      this[_].routeData.getAnnotation("httpMethod")[0].value.toUpperCase() : "GET";
   }
 
   /**
@@ -123,7 +125,7 @@ module.exports = class Route {
    */
   get doBefore(){
     return this[_].routeData.hasAnnotation("doBefore") ?
-      this[_].routeData.getAnnotation("doBefore").value : "";
+      this[_].routeData.getAnnotation("doBefore")[0].value : "";
   }
 
   /**
@@ -141,10 +143,14 @@ module.exports = class Route {
    * @param {Request} req
    */
   validateRequest(req){
-    let httpMethod = this.httpMethod;
-    validateSecureRequest(req, this.isSecure());
-    if(httpMethod !== "GET"){
-      validateHttpMethod(req, httpMethod);
+    try {
+      let httpMethod = this.httpMethod;
+      validateSecureRequest(req, this.isSecure());
+      if(httpMethod !== "GET"){
+        validateHttpMethod(req, httpMethod);
+      }
+    } catch (e){
+      throw e;
     }
   }
 
@@ -156,17 +162,18 @@ module.exports = class Route {
    */
   handle(req, res){
     let controller = this.controller;
-    if(route.doBefore !== ''){
-      if(route.doBefore.indexOf("\\") === -1){
-        controller[route.doBefore](req, res);
+    if(this.doBefore !== ''){
+      // If the doBefore does not reference a namespace, treat as same controller instance.
+      if(this.doBefore.indexOf("\\") === -1){
+        controller[this.doBefore](req, res);
       } else {
-        let doBefore = route.doBefore.split("::");
+        let doBefore = this.doBefore.split("::");
         let targetClass = Autoloader(doBefore[0]);
         let target = new targetClass();
         target[doBefore[1]](req, res);
       }
     }
-    controller[route.controllerMethod](req, res);
+    controller[this.method](req, res);
     if (this[_].routeData.hasAnnotation("json")) {
       res.content = JSON.stringify(res.content);
       res.addHeader('content-type', 'application/json');
