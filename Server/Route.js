@@ -162,6 +162,14 @@ module.exports = class Route {
    */
   handle(req, res){
     let controller = this.controller;
+    if(this[_].routeData.hasAnnotation("model")){
+      let namespace = this[_].routeData.getAnnotation("model")[0].value;
+      let targetModel = Autoloader(namespace);
+      req.model = new targetModel({
+        payload: req.payload,
+        query: req.query
+      });
+    }
     if(this.doBefore !== ''){
       // If the doBefore does not reference a namespace, treat as same controller instance.
       if(this.doBefore.indexOf("\\") === -1){
@@ -172,14 +180,6 @@ module.exports = class Route {
         let target = new targetClass();
         target[doBefore[1]](req, res);
       }
-    }
-    if(this[_].routeData.hasAnnotation("model")){
-      let namespace = this[_].routeData.getAnnotation("model")[0].value;
-      let targetModel = Autoloader(namespace);
-      req.model = new targetModel({
-        payload: req.payload,
-        query: req.query
-      });
     }
     controller[this.method](req, res);
     if (this[_].routeData.hasAnnotation("json")) {
