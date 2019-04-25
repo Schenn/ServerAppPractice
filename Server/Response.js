@@ -84,6 +84,14 @@ module.exports = class Response {
   }
 
   /**
+   * json stringify the outgoing content
+   */
+  toJson(){
+    this.addHeader('content-type', 'application/json');
+    this[_].content = JSON.stringify(this[_].content);
+  }
+
+  /**
    * Get the Headers
    *
    * @return {*|ResponseHeaders|Array}

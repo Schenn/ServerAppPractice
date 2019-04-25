@@ -20,11 +20,13 @@ module.exports = class MockOtherController extends Controller {
    * @route save
    * @httpMethod post
    *
+   * @model Mocks\MockPostModel
    * @param req
    * @param res
    */
   testSave(req, res){
     req.hit = true;
+    res.content = req.model.test;
   }
 
   /**

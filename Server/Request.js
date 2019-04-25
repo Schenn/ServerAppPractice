@@ -19,6 +19,7 @@ module.exports = class Request {
       decoder: new StringDecoder('utf-8'),
       parsedUrl: url.parse(this[_].request.url, true),
       payload: null,
+      model: null
     };
   }
 
@@ -65,6 +66,29 @@ module.exports = class Request {
     return this[_].req.headers;
   }
 
+  /**
+   * Get the incoming content from the request
+   * @return {*|null}
+   */
+  get payload(){
+    return this[_].payload;
+  }
+
+  /**
+   * Create a model for the request using the request data.
+   * @param targetModel
+   */
+  set model(targetModel){
+    this[_].model = targetModel;
+  }
+
+  /**
+   * Get the model instance on the request.
+   * @return {*|null}
+   */
+  get model(){
+    return this[_].model;
+  }
 
   /**
    * Start listening for data and end events. When the request has finished parsing, trigger the onReady callback which

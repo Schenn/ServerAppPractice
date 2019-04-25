@@ -173,10 +173,17 @@ module.exports = class Route {
         target[doBefore[1]](req, res);
       }
     }
+    if(this[_].routeData.hasAnnotation("model")){
+      let namespace = this[_].routeData.getAnnotation("model")[0].value;
+      let targetModel = Autoloader(namespace);
+      req.model = new targetModel({
+        payload: req.payload,
+        query: req.query
+      });
+    }
     controller[this.method](req, res);
     if (this[_].routeData.hasAnnotation("json")) {
-      res.content = JSON.stringify(res.content);
-      res.addHeader('content-type', 'application/json');
+      res.toJson();
     }
   }
 };

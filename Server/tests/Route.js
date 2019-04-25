@@ -89,12 +89,21 @@ const testValidateBadRequest = (route, meta)=>{
 };
 
 const testHandle = (route, methodMeta)=>{
-  let req ={hit: false, doBefore:false};
-  let res = {headers:[], content: '', addHeader:(header, value)=>{res.headers[header] = value;}};
+  let req ={hit: false, doBefore:false, payload: 'test'};
+  let res = {headers:[], content: '', modelTest: '',
+    toJson:()=>{
+      res.addHeader('content-type', 'application/json');
+      res.content = JSON.stringify(res.content);
+    },
+    addHeader:(header, value)=>{res.headers[header] = value;}};
   route.handle(req, res);
   assert.ok(req.hit);
   if(methodMeta.hasAnnotation("doBefore")){
     assert.ok(req.doBefore);
+  }
+  if(methodMeta.hasAnnotation("model")){
+    assert.equal("test", req.model.test);
+    assert.equal("test", res.content);
   }
   if(methodMeta.hasAnnotation("json")){
     assert.equal("application/json", res.headers['content-type']);
