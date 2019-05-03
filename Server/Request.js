@@ -17,7 +17,7 @@ module.exports = class Request {
       req: req,
       isSecure: secure,
       decoder: new StringDecoder('utf-8'),
-      parsedUrl: url.parse(this[_].request.url, true),
+      parsedUrl: url.parse(req.url, true),
       payload: null,
       model: null
     };
