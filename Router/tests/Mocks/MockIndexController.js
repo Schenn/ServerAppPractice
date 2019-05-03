@@ -1,10 +1,8 @@
-const Controller = require("../../../Controllers/Controller");
-
 /**
  * @classRoute /
  * @type {MockIndexController}
  */
-module.exports = class MockIndexController extends Controller {
+module.exports = class MockIndexController {
   /**
    * @route /
    *
