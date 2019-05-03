@@ -1,5 +1,6 @@
 const Connection = require("./Connection");
 const https = require("https");
+const fs = require("fs");
 const _ = Symbol("private");
 
 module.exports = class SecureConnection extends Connection {
