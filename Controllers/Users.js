@@ -17,30 +17,20 @@ module.exports = class Users extends Controller {
     cb(this.createResponse(200, 'Success Yo'));
   }
 
-  validateUser(payload){
+  validateUser(req, res){
 
   }
 
   /**
    * @route create
    * @httpMethod post
+   * @model Entities/User
    * @doBefore validateUser
-   *
-   * @param data
-   * @param cb
    */
-  create(data, cb) {
-    let firstName = typeof data.payload.firstName === 'string' ?
-        data.payload.firstName.trim() : false;
-    let lastName = typeof data.payload.lastName === 'string' ?
-        data.payload.lastName.trim() : false;
-    let username = typeof data.payload.userName === 'string' ?
-        data.payload.userName.trim() : false;
-    let tos = typeof data.payload.tos === 'boolean' && data.payload.tos ===
-        true;
-
-    if (!firstName || !lastName || !username || !tos) {
-      cb(this.createResponse(400, {'Error': 'Missing Required Fields.'}));
+  create(req, res) {
+    let tos = req.payload.tos;
+    if (!req.model.isValid() || !tos) {
+      res.error(400, 'Missing Required Fields');
     } else {
       // Make sure user doesn't already exist.
       let writer = new Writer();
@@ -59,7 +49,6 @@ module.exports = class Users extends Controller {
             let data = user.data();
 
           }
-
         } else {
           cb(this.createResponse(400, {'Error': 'A user with that phone number exists.'}));
         }

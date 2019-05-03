@@ -2,7 +2,6 @@ const path = require("path");
 const env = require("./config");
 
 const Server = require("./Server/Server");
-const Router = require("./Server/Router");
 const RouteCollector = require("./Collectors/RouteCollector");
 
 /**
@@ -18,5 +17,6 @@ const startServer = function(router){
 };
 
 let routeCollector = new RouteCollector();
-routeCollector.buildCache(path.join(process.cwd(),"Controllers"), startServer);
+routeCollector.buildCache(path.join(process.cwd(),"Controllers")).then(startServer);
+
 

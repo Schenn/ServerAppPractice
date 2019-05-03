@@ -15,13 +15,26 @@ class Server {
    *
    * @param {Router} router The router class which handles routing incoming requests to the appropriate methods.
    */
-  constructor(router){
+  constructor(){
     this[_] = {
-      router: router,
+      router: null,
       logger: console,
       connections: [],
       environment: '',
     };
+  }
+
+  /**
+   * Set the Router the server should use to handle requests
+   *
+   *  {handle:(request, response)=>{ doSomethingWithRequest(request); doSomethingWithResponse(response); }}
+   * @param {Object} router
+   */
+  set router(router){
+    if(typeof(router.handle) !== "function"){
+      throw Error("Provided router requires a handle method. None provided.");
+    }
+    this[_].router = router;
   }
 
   /**
@@ -49,16 +62,7 @@ class Server {
    */
   createConnection(port, key = null){
     let handle = (req, res)=>{
-      let request = new Request(req, !!key);
-      let response = new Response(res);
-      try {
-        req.init(()=>{
-          this[_].router.handle(request, response);
-        });
-      } catch(e){
-        logger.log(e);
-        response.error(405, e);
-      }
+      this.handle(new Request(req, !!key), new Response(res));
     };
 
     let connection = (key) ?
@@ -67,6 +71,22 @@ class Server {
 
     connection.open();
     this[_].connections.push(connection);
+  }
+
+  handle(req, res){
+    try {
+      if(this[_].router){
+        req.init(()=>{
+          this[_].router.handle(req, res);
+        });
+      } else {
+        throw Error("No router set to handle incoming requests.");
+      }
+
+    } catch(e){
+      logger.log(e);
+      resp.error(405, e);
+    }
   }
 }
 

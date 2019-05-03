@@ -74,4 +74,7 @@ module.exports = class User {
     this[this._].password = password;
   }
 
+  isValid(){
+    return false;
+  }
 };

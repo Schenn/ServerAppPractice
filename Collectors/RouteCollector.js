@@ -10,7 +10,9 @@ module.exports = class RouteCollector extends Collector {
 
   constructor(){
     super();
-    this[_].router = new Router();
+    this[_] = {
+      router: new Router()
+    };
   }
 
   /**
@@ -24,11 +26,11 @@ module.exports = class RouteCollector extends Collector {
   /**
    * Collect the methods from a controller and memoize any routes found.
    *
-   * @param {Object} controllerData
+   * @param {Object | Metadata} controllerData
    */
-  addRoutes(controllerData){
+  addRoutes(controllerData, namespace){
     if(!controllerData.classDoc.hasAnnotation("classRoute")){
-      controllerData.classDoc.addAnnotation(`@classRoute ${namespace.toLowerCase()}`);
+      controllerData.classDoc.addAnnotation(`* @classRoute ${namespace.toLowerCase()}`);
     }
 
     for(let method of controllerData.methods){
@@ -45,18 +47,14 @@ module.exports = class RouteCollector extends Collector {
    * Collect the controllers found on a given path and identify the routes that belong to it.
    *
    * @param {String} controllerPath The parent directory for your controllers
-   * @param {function} cb The callback to trigger when all the controllers have been processed.
    */
-  buildCache(controllerPath, cb){
-    this.onFileParsed = (controllerData, namespace) => {
-      if(!controllerData.classDoc.hasAnnotation("classRoute")){
-        controllerData.classDoc.addAnnotation(`@classRoute ${namespace.toLowerCase()}`);
-      }
-      this.addRoutes(controllerData);
-    };
-    this.onComplete = ()=>{
-      cb(this[_].router);
-    };
-    this.collectFromPath(controllerPath);
+  buildCache(controllerPath){
+    this.on("fileParsed" , this.addRoutes.bind(this));
+    this.filePath = controllerPath;
+    return new Promise((resolve, reject)=>{
+      this.collect().then(()=>{
+        resolve(this[_].router);
+      });
+    });
   }
 };
