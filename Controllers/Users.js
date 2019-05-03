@@ -1,4 +1,4 @@
-const Controller = require('../Server/Controller');
+const Controller = require('./Controller');
 const Writer = require('../lib/Writer');
 const User = require('../Entities_old/User');
 
