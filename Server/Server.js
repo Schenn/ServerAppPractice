@@ -85,7 +85,7 @@ class Server {
 
     } catch(e){
       logger.log(e);
-      resp.error(405, e);
+      res.error(405, e);
     }
   }
 }
