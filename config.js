@@ -5,7 +5,11 @@ const workingPath = (sub)=>{
 };
 
 const environments = {
-  dev: {
+  local: {
+    port: 3000,
+    env: 'localdev'
+  },
+  dockerdev: {
     port: 3000,
     https: {
       port: 3001,
@@ -38,11 +42,11 @@ const environments = {
 };
 
 
-const env = typeof(process.env.NODE_ENV) === 'string' ? process.env.NODE_ENV.toLowerCase() : 'dev';
+const env = typeof(process.env.NODE_ENV) === 'string' ? process.env.NODE_ENV.toLowerCase() : 'local';
 
 /**
  * @type {environments.dev|{port, https, env}}
  */
-const currentEnv = typeof(environments[env]) !== "undefined" ? environments[env] : environments.dev;
+const currentEnv = typeof(environments[env]) !== "undefined" ? environments[env] : environments.local;
 
 module.exports = currentEnv;
