@@ -1,6 +1,6 @@
 const cleanRegex = /^\/+|\/+$/g;
 const path = require("path");
-const Response = require("./Response");
+const Response = require("../Server/Response");
 const Collector = require("../NodeAnnotations/Collector");
 
 const _ = Symbol("private");

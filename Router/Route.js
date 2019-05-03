@@ -1,4 +1,4 @@
-const Autoloader = require("./Autoloader");
+const Autoloader = require("../Server/Autoloader");
 const _ = Symbol("private");
 const secureMethods = ["PUT", "POST", "DELETE"];
 

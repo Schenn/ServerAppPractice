@@ -2,7 +2,7 @@ const path = require("path");
 const env = require("./config");
 
 const Server = require("./Server/Server");
-const Router = require("./Server/Router");
+const Router = require("./Router/Router");
 
 const server = new Server();
 server.environment = env.env;
