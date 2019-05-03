@@ -2,21 +2,38 @@ const path = require("path");
 const env = require("./config");
 
 const Server = require("./Server/Server");
-const RouteCollector = require("./Collectors/RouteCollector");
+const Router = require("./Server/Router");
+
+const server = new Server();
+server.environment = env.env;
 
 /**
- * Create a server and start listening for connections.
+ * A Router is a class which interprets incoming paths and intelligently passes the request to the appropriate handler.
  *
- * @param {Router} router
+ *  Assigns the router handler to the server handler.
+ * @return {Promise}
  */
-const startServer = function(router){
-  let server = new Server(router);
-  server.environment = env.env;
-  server.createConnection(env.port);
-  server.createConnection(env.https.port, env.https.key);
+const createRouter = ()=>{
+  let router = new Router();
+  server.handler = router.handle.bind(router);
+  return router.buildCache(path.join(process.cwd(),"Controllers"));
 };
 
-let routeCollector = new RouteCollector();
-routeCollector.buildCache(path.join(process.cwd(),"Controllers")).then(startServer);
+/**
+ * An Entity Manager is a class which handles preparing, validating, storing, and
+ *    creating data models known as Entities.
+ */
+const createEntityManager = ()=>{
 
+};
+
+const listen = ()=>{
+  server.createConnection(env.port);
+  if(env.https){
+    server.createConnection(env.https.port, env.https.key);
+  }
+};
+
+Promise.race([createRouter(), createEntityManager()])
+  .then(listen);
 

@@ -1,6 +1,7 @@
 const cleanRegex = /^\/+|\/+$/g;
 const path = require("path");
 const Response = require("./Response");
+const Collector = require("../NodeAnnotations/Collector");
 
 const _ = Symbol("private");
 
@@ -9,8 +10,9 @@ const _ = Symbol("private");
  *
  * @type {Router}
  */
-module.exports = class Router {
+module.exports = class Router extends Collector {
   constructor(){
+    super();
     this[_] = {
       routes:{}
     };
@@ -18,6 +20,10 @@ module.exports = class Router {
 
   /**
    * Add a route to the router.
+   *
+   *  The route is memoized as httpMethod::path.
+   *    That way multiple methods can each handle a different http method for a given path.
+   *    (e.g. GET /create -- controller::renderForm. POST /create -- controller::saveForm.)
    *
    * @param {Route} route
    */
@@ -31,15 +37,25 @@ module.exports = class Router {
   }
 
   /**
-   * Add a collection of routes to the routemaps.
+   * Collect the methods from a controller and memoize any routes found.
    *
-   * @param {array} routes
+   * @param {Object | Metadata} controllerData
    */
-  addRoutes(routes){
-    for(let route in routes){
-      this.addRoute(routes[route]);
+  addRoutes(controllerData, namespace){
+    if(!controllerData.classDoc.hasAnnotation("classRoute")){
+      controllerData.classDoc.annotationFromPhrase(`* @classRoute ${namespace.toLowerCase()}`);
+    }
+
+    for(let method of controllerData.methods){
+      let methodData = controllerData.forMethod(method);
+      if(!methodData.hasAnnotation("route")){
+        continue;
+      }
+
+      this.addRoute(new Route(controllerData, method));
     }
   }
+
 
   /**
    * Get the data object for a given route.
@@ -56,6 +72,21 @@ module.exports = class Router {
     return this[_].routes[path] ?
       this[_].routes[path] :
       null;
+  }
+
+  /**
+   * Collect the controllers found on a given path and identify the routes that belong to it.
+   *
+   * @param {String} controllerPath The parent directory for your controllers
+   */
+  buildCache(controllerPath){
+    this.on("fileParsed" , this.addRoutes.bind(this));
+    this.filePath = controllerPath;
+    return new Promise((resolve, reject)=>{
+      this.collect().then(()=>{
+        resolve(this);
+      });
+    });
   }
 
   /**

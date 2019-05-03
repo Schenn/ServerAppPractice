@@ -30,5 +30,5 @@ let test = (meta)=>{
     }
   }
 };
-indexMeta.parseFile(mockIndexController, test(indexMeta));
-otherMeta.parseFile(mockOtherController, test(otherMeta));
+indexMeta.parseFile(mockIndexController).then(()=>{test(indexMeta)});
+otherMeta.parseFile(mockOtherController).then(()=>{test(otherMeta)});

@@ -8,7 +8,7 @@ const _ = Symbol("private");
 /**
  * Creates and manages the http and https connections that the application uses.
  */
-class Server {
+module.exports = class Server {
   /**
    * Create a raw server to host connections from.
    *  You must provide a class that knows how to take a route and do something with it.
@@ -17,7 +17,7 @@ class Server {
    */
   constructor(){
     this[_] = {
-      router: null,
+      handler: null,
       logger: console,
       connections: [],
       environment: '',
@@ -25,16 +25,13 @@ class Server {
   }
 
   /**
-   * Set the Router the server should use to handle requests
+   * Set the Handler the server should use to handle requests
    *
    *  {handle:(request, response)=>{ doSomethingWithRequest(request); doSomethingWithResponse(response); }}
-   * @param {Object} router
+   * @param {Object} handler
    */
-  set router(router){
-    if(typeof(router.handle) !== "function"){
-      throw Error("Provided router requires a handle method. None provided.");
-    }
-    this[_].router = router;
+  set handler(handler){
+    this[_].handler = handler;
   }
 
   /**
@@ -73,21 +70,24 @@ class Server {
     this[_].connections.push(connection);
   }
 
+  /**
+   * A request was heard from one of the connections. Handle it.
+   *
+   * @param {module.Request} req
+   * @param {module.Response} res
+   * @throws If no router is set to handle incoming requests when the first request is made.
+   */
   handle(req, res){
+    if(!this[_].handler){
+      throw Error("No handler set to handle incoming requests.");
+    }
     try {
-      if(this[_].router){
-        req.init(()=>{
-          this[_].router.handle(req, res);
-        });
-      } else {
-        throw Error("No router set to handle incoming requests.");
-      }
-
+      req.init(()=>{
+        this[_].handler(req, res);
+      });
     } catch(e){
-      logger.log(e);
+      this[_].logger.log(e);
       res.error(405, e);
     }
   }
-}
-
-module.exports = Server;
+};
