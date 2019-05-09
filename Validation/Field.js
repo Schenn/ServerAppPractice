@@ -1,10 +1,10 @@
 const Required = require("./Options/Required");
+const _ = Symbol("private");
 
 module.exports = class Field {
 
   constructor(){
-    this._ = Symbol(this.constructor.name);
-    this[this._] = {
+    this[_] = {
       name: '',
       value: '',
       options: {},
@@ -13,43 +13,48 @@ module.exports = class Field {
   }
 
   set value(value){
-    this[this._].value = value;
+    this[_].value = value;
   }
 
   get value(){
-    return this[this._].value;
+    return this[_].value;
   }
 
   set required(required){
-    if(required && typeof this[this._].options.required === "undefined"){
-      this[this._].options.required = new Required();
-    } else if (!required && typeof this[this._].options.required !== "undefined") {
-      delete this[this._].options.required;
+    if(required && typeof this[_].options.required === "undefined"){
+      // If setting to true, and not already, make required.
+      this[_].options.required = new Required();
+    } else if (!required && typeof this[_].options.required !== "undefined") {
+      // If setting to false, and currently true, unrequire.
+      delete this[_].options.required;
     }
 
+  }
+
+  addOption(optionName, option){
+    let target = new option.option();
+    if(typeof option.args !== "undefined"){
+      for(let arg of option.args){
+        target[arg] = option.args[arg];
+      }
+    }
+    this[_].options[opt] = target;
   }
 
   initOptions(options){
     for(let opt of options) {
-      let option = options[opt];
-      let target = new option.option();
-      if(typeof option.args !== "undefined"){
-        for(let arg of option.args){
-          target[arg] = option.args[arg];
-        }
-      }
-      this[this._].options[opt] = target;
+      this.addOption(opt, options[opt]);
     }
   }
 
   getOption (opt){
-    return this[this._].options[opt];
+    return this[_].options[opt];
   }
 
   isValid(){
     let valid;
-    for(let opt of this[this._].options){
-      let option = this[this._].options[opt];
+    for(let opt of this[_].options){
+      let option = this[_].options[opt];
       valid = option.isValid(this.value);
       if(!valid){
         break;

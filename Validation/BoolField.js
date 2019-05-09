@@ -13,10 +13,12 @@ module.exports = class BoolField extends Field {
   }
 
   requireTrue(){
-    this.initOptions({"value":{option: Options.BoolOpt}})
+    this.initOptions({"value":{option: Options.BoolOpt}});
+    return this;
   }
 
   requireFalse(){
-    this.initOptions({"value":{option: Options.BoolOpt, args: {is: false}}})
+    this.initOptions({"value":{option: Options.BoolOpt, args: {is: false}}});
+    return this;
   }
 };
