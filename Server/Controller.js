@@ -1,5 +1,5 @@
 const _ = Symbol("private");
-const Response = require("../Server/Response");
+const Response = require("./Response");
 
 /**
  * Controller is the base class used by the server controller classes.
