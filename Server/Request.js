@@ -1,5 +1,6 @@
 const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
+const Autoloader = require("../Server/Autoloader");
 
 const _ = Symbol("private");
 
@@ -19,7 +20,6 @@ module.exports = class Request {
       decoder: new StringDecoder('utf-8'),
       parsedUrl: url.parse(req.url, true),
       payload: null,
-      model: null,
       form: null
     };
   }
@@ -76,19 +76,20 @@ module.exports = class Request {
   }
 
   /**
-   * Create a model for the request using the request data.
-   * @param targetModel
+   * Set the form which the request should carry.
+   * @param {string} targetForm
    */
-  set model(targetModel){
-    this[_].model = targetModel;
+  useForm(target){
+    let targetForm = Autoloader(target);
+    this[_].form = new targetForm(this[_].payload);
   }
 
   /**
-   * Get the model instance on the request.
+   * Get the form instance on the request.
    * @return {*|null}
    */
-  get model(){
-    return this[_].model;
+  get form(){
+    return this[_].form;
   }
 
   /**
