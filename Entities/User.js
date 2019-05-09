@@ -1,12 +1,15 @@
+const _ = Symbol("private");
 
+/**
+ * @type {module.User}
+ */
 module.exports = class User {
 
-  constructor(){
-    this._ = Symbol("user");
-    this[this._] = {
+  constructor(payload){
+    this[_] = {
       firstName: '',
       lastName: '',
-      username: '',
+      phone:  '',
       password: '',
     };
   }
@@ -15,66 +18,55 @@ module.exports = class User {
    * @return {string}
    */
   get firstName(){
-    return this[this._].firstName;
+    return this[_].firstName;
   }
 
   /**
-   * @validator {TextField} required
    * @param {string} name
    */
   set firstName(name){
-    this[this._].firstName = name;
+    this[_].firstName = name;
   }
 
   /**
    * @return {string}
    */
   get lastName(){
-    return this[this._].lastName;
+    return this[_].lastName;
   }
 
   /**
-   * @validator {TextField} required
    * @param {string} name
    */
   set lastName(name){
-    this[this._].lastName = name;
+    this[_].lastName = name;
   }
 
   /**
    * @return {string}
    */
-  get username(){
-    return this[this._].username;
+  get phone(){
+    return this[_].phone;
   }
 
   /**
-   * @validator {TextField} required
-   * @db:constraint unique
-   *
    * @param {string} username
    */
-  set username(username){
-    this[this._].username = name;
+  set phone(phone){
+    this[_].phone = phone;
   }
 
   /**
    * @return {string}
    */
   get password(){
-    return this[this._].password;
+    return this[_].password;
   }
 
   /**
-   * @field hash
-   * @validator {HashField} required
    * @param {string} password
    */
   set password(password){
-    this[this._].password = password;
-  }
-
-  isValid(){
-    return false;
+    this[_].password = password;
   }
 };
