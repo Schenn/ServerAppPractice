@@ -19,7 +19,8 @@ module.exports = class Request {
       decoder: new StringDecoder('utf-8'),
       parsedUrl: url.parse(req.url, true),
       payload: null,
-      model: null
+      model: null,
+      form: null
     };
   }
 
