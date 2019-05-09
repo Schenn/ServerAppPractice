@@ -19,9 +19,6 @@ RUN chmod 0755 /home/app/
 
 USER app
 
-EXPOSE 8080
-EXPOSE 8081
-
 ENV NODE_ENV dockerdev
 
 CMD ["node", "./index.js"]

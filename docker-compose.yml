@@ -1,0 +1,17 @@
+version: '3'
+services:
+  server:
+    build: .
+    ports:
+      - "8080:3000"
+      - "8081:3001"
+    volumes:
+      - ./Controllers:/home/app/src/Controllers
+      - ./Datafake:/home/app/src/Datafake
+      - ./Entities:/home/app/src/Entities
+      - ./Forms:/home/app/src/Forms
+      - ./lib:/home/app/src/lib
+      - ./Router:/home/app/src/Router
+      - ./Server:/home/app/src/Server
+      - ./Validation:/home/app/src/Validation
+      - ./NodeAnnotations:/home/app/src/NodeAnnotations
