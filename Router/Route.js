@@ -128,6 +128,10 @@ module.exports = class Route {
       this[_].routeData.getAnnotation("doBefore")[0].value : "";
   }
 
+  get form(){
+    return this[_].routeData.hasAnnotation("form") ? this[_].routeData.getAnnotation("form")[0] : "";
+  }
+
   /**
    * Does the route require a secure connection
    *
@@ -155,35 +159,44 @@ module.exports = class Route {
   }
 
   /**
-   * The route has been triggered, call the appropriate controller method.
+   * The route has been triggered, call the appropriate handler methods.
    *
-   * @param {Request} req
-   * @param {Response} res
+   * @param {module.Request} req
+   * @param {module.Response} res
    */
   handle(req, res){
     let controller = this.controller;
-    if(this[_].routeData.hasAnnotation("model")){
-      let namespace = this[_].routeData.getAnnotation("model")[0].value;
-      let targetModel = Autoloader(namespace);
-      req.model = new targetModel({
-        payload: req.payload,
-        query: req.query
-      });
+    let doBefore = this.doBefore;
+    let hasDoBefore = doBefore !== '';
+
+    if(this.form){
+      req.useForm(this.form);
     }
-    if(this.doBefore !== ''){
-      // If the doBefore does not reference a namespace, treat as same controller instance.
-      if(this.doBefore.indexOf("\\") === -1){
-        controller[this.doBefore](req, res);
+      // If the response wasn't closed by an invalid form
+    if(res.isOpen() && hasDoBefore) {
+      // @doBefore path/to/class::method  (e.g. game/scoreboard::addHighScore)
+      if (doBefore.indexOf("\\") === -1) {
+        // If the doBefore does not reference a namespace, treat as same controller instance.
+        controller[doBefore](req, res);
       } else {
-        let doBefore = this.doBefore.split("::");
-        let targetClass = Autoloader(doBefore[0]);
+        let namespacedDoBefore = doBefore.split("::");
+        let targetClass = Autoloader(namespacedDoBefore[0]);
         let target = new targetClass();
-        target[doBefore[1]](req, res);
+        target[namespacedDoBefore[1]](req, res);
       }
     }
-    controller[this.method](req, res);
-    if (this[_].routeData.hasAnnotation("json")) {
-      res.toJson();
+
+    // If the response wasn't closed by an error in the same class method referenced in the dobefore,
+    //  or if there is no doBefore method specified.
+    if(res.isOpen()){
+      controller[this.method](req, res);
+      if (this[_].routeData.hasAnnotation("json")) {
+        res.toJson();
+      }
+    }
+
+    if(res.isOpen()){
+      res.close();
     }
   }
 };
