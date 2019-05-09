@@ -13,18 +13,10 @@ server.environment = env.env;
  *  Assigns the router handler to the server handler.
  * @return {Promise}
  */
-const createRouter = ()=>{
+async function createRouter (){
   let router = new Router();
   server.handler = router.handle.bind(router);
   return router.buildCache(path.join(process.cwd(),"Controllers"));
-};
-
-/**
- * An Entity Manager is a class which handles preparing, validating, storing, and
- *    creating data models known as Entities.
- */
-const createEntityManager = ()=>{
-
 };
 
 const listen = ()=>{
@@ -34,6 +26,6 @@ const listen = ()=>{
   }
 };
 
-Promise.race([createRouter(), createEntityManager()])
-  .then(listen);
+await createRouter();
 
+listen();
