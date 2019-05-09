@@ -8,7 +8,7 @@ module.exports = class Connection {
    * @param {number} port
    * @param {function} handler
    */
-  constructor(port, handler) {
+  constructor(port, handler=(req, res)=>{console.log("Heard Request.");}) {
     this[_] = {
       port: port,
       handler: handler,
@@ -16,10 +16,6 @@ module.exports = class Connection {
     };
   }
 
-  /**
-   * Get the connection handler
-   * @return {*|Function}
-   */
   get handler(){
     return this[_].handler;
   }
@@ -32,6 +28,11 @@ module.exports = class Connection {
     return this[_].port;
   }
 
+  setServer(server, onListening){
+    this[_].server = server;
+    this[_].server.listen(this[_].port, onListening);
+  }
+
   /**
    * Start listening for connections
    *
@@ -39,9 +40,9 @@ module.exports = class Connection {
    */
   open(onListening = null){
     if(!onListening){
-      onListening = ()=>{console.log(`Connection created on port: ${this[_].port}`)};
+      onListening = ()=>{console.log(`Connection created on port: ${this.port}`)};
     }
-    this[_].server = http.createServer(this.handler);
-    this[_].server.listen(this[_].port, onListening);
+
+    this.setServer(http.createServer(this.handler), onListening);
   }
 };

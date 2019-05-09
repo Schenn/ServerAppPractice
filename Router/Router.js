@@ -1,14 +1,13 @@
 const cleanRegex = /^\/+|\/+$/g;
-const path = require("path");
-const Response = require("../Server/Response");
 const Collector = require("../NodeAnnotations/Collector");
+const Route = require("./Route");
 
 const _ = Symbol("private");
 
 /**
  * Handle redirecting routes to class methods.
  *
- * @type {Router}
+ * @type {module.Router}
  */
 module.exports = class Router extends Collector {
   constructor(){
@@ -25,7 +24,7 @@ module.exports = class Router extends Collector {
    *    That way multiple methods can each handle a different http method for a given path.
    *    (e.g. GET /create -- controller::renderForm. POST /create -- controller::saveForm.)
    *
-   * @param {Route} route
+   * @param {module.Route} route
    */
   addRoute(route){
     let cleanPath = route.routePath.replace(cleanRegex, '');
@@ -39,7 +38,7 @@ module.exports = class Router extends Collector {
   /**
    * Collect the methods from a controller and memoize any routes found.
    *
-   * @param {Object | Metadata} controllerData
+   * @param {Object | module.Metadata} controllerData
    */
   addRoutes(controllerData, namespace){
     if(!controllerData.classDoc.hasAnnotation("classRoute")){
@@ -60,7 +59,7 @@ module.exports = class Router extends Collector {
   /**
    * Get the data object for a given route.
    *
-   * @param {Request} req The request object.
+   * @param {module.Request} req The request object.
    * @return {Object}
    */
   routeMeta(req){
@@ -77,7 +76,7 @@ module.exports = class Router extends Collector {
   /**
    * Collect the controllers found on a given path and identify the routes that belong to it.
    *
-   * @param {String} controllerPath The parent directory for your controllers
+   * @param {string} controllerPath The parent directory for your controllers
    */
   buildCache(controllerPath){
     this.on("fileParsed" , this.addRoutes.bind(this));
@@ -92,8 +91,8 @@ module.exports = class Router extends Collector {
   /**
    * Get the controller for the given path and trigger the matching route handler.
    *
-   * @param {Request} req
-   * @param {Response} res
+   * @param {module.Request} req
+   * @param {module.Response} res
    */
   handle(req, res) {
     let route = this.routeMeta(req);
