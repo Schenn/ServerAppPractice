@@ -1,6 +1,6 @@
-const Controller = require('./Controller');
+const Controller = require('../Server/Controller');
 const Writer = require('../lib/Writer');
-const User = require('../Entities_old/User');
+const User = require('../Entities/User');
 
 /**
  * @classRoute u
@@ -10,47 +10,34 @@ module.exports = class Users extends Controller {
 
   /**
    * @route /
-   * @param {object} data (should be empty)
-   * @param cb
+   * @param {module.Request} req
+   * @param {module.Response} res
    */
-  index(data, cb) {
-    cb(this.createResponse(200, 'Success Yo'));
-  }
-
-  validateUser(req, res){
-
+  index(req, res) {
+    res.content = "Success Yo";
   }
 
   /**
    * @route create
    * @httpMethod post
-   * @model Entities/User
-   * @doBefore validateUser
+   * @form Forms/NewUser
+   * @param {module.Request} req
+   * @param {module.Response} res
    */
   create(req, res) {
-    let tos = req.payload.tos;
-    if (!req.model.isValid() || !tos) {
+    if(!req.form.isValid()) {
+      res.content = req.form.errors;
       res.error(400, 'Missing Required Fields');
     } else {
+      let user = req.form.getEntity();
       // Make sure user doesn't already exist.
       let writer = new Writer();
       writer.read('users', phone, (err, data) => {
         if (err) {
-          // user doesn't exist. Create.
-          let user = new User();
-          user.firstName = firstName;
-          user.lastName = lastName;
-          user.username = username;
-          user.tos = tos;
-          user.password = 'monkey';
-
-          // Save it to the 'DB'
-          if (user.isValid()) {
-            let data = user.data();
-
-          }
+          res.error(400, 'A user with that phone number exists.');
         } else {
-          cb(this.createResponse(400, {'Error': 'A user with that phone number exists.'}));
+          // Save user to the 'DB'
+          
         }
       });
 
@@ -59,22 +46,22 @@ module.exports = class Users extends Controller {
 
   /**
    * @route update
-   * @method put
+   * @httpMethod put
    *
-   * @param data
-   * @param cb
+   * @param req
+   * @param res
    */
-  update(data, cb) {
+  update(req, res) {
 
   }
 
   /**
    * @route delete
-   * @method delete
-   * @param data
-   * @param cb
+   * @httpMethod delete
+   * @param req
+   * @param res
    */
-  delete(data, cb) {
+  delete(req, res) {
 
   }
 
