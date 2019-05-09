@@ -8,7 +8,8 @@ module.exports = class Response {
       statusCode: 200,
       statusMessage: '',
       headers: [],
-      content: ''
+      content: '',
+      closed: false
     };
   }
 
@@ -104,12 +105,22 @@ module.exports = class Response {
    * Close the response object and return the resulting content to the client.
    */
   close(){
+    this[_].closed = true;
     if(this.statusMessage !== ""){
       this[_].response.writeHead(this.statusCode, this.statusMessage);
     } else {
       this[_].response.writeHead(this.statusCode);
     }
     this[_].response.end(this.content);
+  }
+
+  /**
+   * Has the response been closed due to an error?
+   *
+   * @return {boolean}
+   */
+  isOpen(){
+    return !this[_].closed;
   }
 
   /**
