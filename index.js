@@ -13,7 +13,7 @@ server.environment = env.env;
  *  Assigns the router handler to the server handler.
  * @return {Promise}
  */
-async function createRouter (){
+const createRouter = ()=>{
   let router = new Router();
   server.handler = router.handle.bind(router);
   return router.buildCache(path.join(process.cwd(),"Controllers"));
@@ -26,6 +26,6 @@ const listen = ()=>{
   }
 };
 
-await createRouter();
-
-listen();
+createRouter().then(()=>{
+  listen();
+});
