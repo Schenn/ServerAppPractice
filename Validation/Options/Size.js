@@ -9,6 +9,9 @@ module.exports = class Size extends Option {
   }
 
   isValid(value) {
+    if(typeof value === "undefined"){
+      return !(this.min > 0 || this.max > 0);
+    }
     let size = (typeof value === "number") ?
         value :
         value.length;

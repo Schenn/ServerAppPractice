@@ -7,12 +7,13 @@ module.exports = class SecureConnection extends Connection {
   /**
    * @param {number} port
    * @param {function} handler
-   * @param {string} key
+   * @param {{key: string, cert: string}} certs
    */
-  constructor(port, handler, key) {
+  constructor(port, handler, certs) {
     super(port, handler);
     this[_] = {
-      key: fs.readFileSync(key)
+      key: fs.readFileSync(certs.key),
+      cert: fs.readFileSync(certs.cert)
     };
   }
 
@@ -25,6 +26,6 @@ module.exports = class SecureConnection extends Connection {
     if(!onListening){
       onListening = ()=>{console.log(`Secure Connection created on port: ${this.port}`)};
     }
-    this.setServer(https.createServer(this[_].key, this.handler), onListening);
+    this.setServer(https.createServer({key: this[_].key, cert: this[_].cert}, this.handler), onListening);
   }
 };

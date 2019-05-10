@@ -6,7 +6,7 @@ module.exports = class Form {
   constructor(payload){
     this[_] = {
       payload: payload,
-      fieldValidators: {},
+      fields: {},
       invalidFlags: {}
     };
   }
@@ -36,22 +36,22 @@ module.exports = class Form {
     let valid = true;
     this[_].invalidFlags = [];
     for(let field in this[_].fields){
-      let validator = this[_].fields;
-      validator.value = this[_].payload[field];
-      // IF YOU ARE OVERRIDING THIS METHOD --
-      //  The validator options throw an error when the provided value fails.
-      // Get all failed validators. Could also break on error to stop at first failure.
-      try {
-        validator.isValid();
-      } catch (e){
-        valid = false;
-        if(typeof this[_].invalidFlags[field] === "undefined"){
-          this[_].invalidFlags[field] = [];
+      let validators = this[_].fields[field];
+      for(let validator of validators){
+        validator.value = this[_].payload[field];
+        // IF YOU ARE OVERRIDING THIS METHOD --
+        //  The validator options throw an error when the provided value fails.
+        // Get all failed validators. Could also break on error to stop at first failure.
+        if(!validator.isValid()){
+          valid = false;
+          if(typeof this[_].invalidFlags[field] === "undefined"){
+            this[_].invalidFlags[field] = [];
+          }
+          this[_].invalidFlags[field].push(`${field} has invalid value: ${this[_].payload[field]}`);
+          break;
         }
-        this[_].invalidFlags[field].push(e);
       }
     }
-
     return valid;
   }
 
@@ -61,6 +61,7 @@ module.exports = class Form {
    * @return {invalidFlags|{}|Array}
    */
   get errors(){
+    console.log(this[_].invalidFlags);
     return this[_].invalidFlags;
   }
 

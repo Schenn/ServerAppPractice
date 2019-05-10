@@ -1,18 +1,13 @@
-const Instance = require("./Instance");
+const Option = require("./Option");
 
-module.exports = class Text extends Instance {
+module.exports = class Text extends Option {
   constructor(){
     super();
-    this.isInstanceOf = String;
     this.pattern = null;
   }
 
   isValid(value){
-    if(this.pattern === null){
-      return super.isValid(value);
-    }
-    if(super.isValid(value)){
-      return new RegExp(this.pattern).test(value);
-    }
+    return (this.pattern === null) ? true:
+      new RegExp(this.pattern).test(value);
   }
 };

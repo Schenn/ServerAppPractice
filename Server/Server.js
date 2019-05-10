@@ -55,7 +55,7 @@ module.exports = class Server {
   /**
    * Create an http connection
    * @param {number} port The port to listen on.
-   * @param {string|null} key path to the SSH key.
+   * @param {{key:string, cert: string}|null} key path to the SSH key.
    */
   createConnection(port, key = null){
     let handle = (req, res)=>{
@@ -81,13 +81,13 @@ module.exports = class Server {
     if(!this[_].handler){
       throw Error("No handler set to handle incoming requests.");
     }
-    try {
-      req.init(()=>{
+    req.init(()=>{
+      try {
         this[_].handler(req, res);
-      });
-    } catch(e){
-      this[_].logger.log(e);
-      res.error(405, e);
-    }
+      } catch(e){
+        this[_].logger.log(e);
+        res.error(405, e);
+      }
+    });
   }
 };

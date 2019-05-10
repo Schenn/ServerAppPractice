@@ -34,15 +34,15 @@ module.exports = class Field {
   addOption(optionName, option){
     let target = new option.option();
     if(typeof option.args !== "undefined"){
-      for(let arg of option.args){
+      for(let arg in option.args){
         target[arg] = option.args[arg];
       }
     }
-    this[_].options[opt] = target;
+    this[_].options[optionName] = target;
   }
 
   initOptions(options){
-    for(let opt of options) {
+    for(let opt in options) {
       this.addOption(opt, options[opt]);
     }
   }
@@ -53,7 +53,7 @@ module.exports = class Field {
 
   isValid(){
     let valid;
-    for(let opt of this[_].options){
+    for(let opt in this[_].options){
       let option = this[_].options[opt];
       valid = option.isValid(this.value);
       if(!valid){

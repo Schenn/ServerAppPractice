@@ -5,6 +5,7 @@ const _ = Symbol("private");
 
 module.exports = class HashField extends TextField{
   constructor(){
+    super();
     this[_] = {
       secret: 'foo',
       algo: 'sha256',
@@ -27,9 +28,13 @@ module.exports = class HashField extends TextField{
     return this;
   }
 
+  set value(value){
+    super.value = value;
+  }
+
   get value(){
     let value = super.value;
-    if(value.length === 0){
+    if(typeof value === "undefined" || value.length === 0){
       return false;
     }
     return crypto.createHmac(this[_].algo, this[_].secret).update(value).digest(this[_].encoding);

@@ -1,5 +1,6 @@
 const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
+const qs = require("querystring");
 const Autoloader = require("../Server/Autoloader");
 
 const _ = Symbol("private");
@@ -19,7 +20,7 @@ module.exports = class Request {
       isSecure: secure,
       decoder: new StringDecoder('utf-8'),
       parsedUrl: url.parse(req.url, true),
-      payload: null,
+      payload: '',
       form: null
     };
   }
@@ -81,7 +82,7 @@ module.exports = class Request {
    */
   useForm(target){
     let targetForm = Autoloader(target);
-    this[_].form = new targetForm(this[_].payload);
+    this[_].form = new targetForm(qs.parse(this[_].payload));
   }
 
   /**

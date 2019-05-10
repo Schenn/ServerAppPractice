@@ -26,20 +26,12 @@ module.exports = class Users extends Controller {
    */
   create(req, res) {
     if(!req.form.isValid()) {
-      res.content = req.form.errors;
+      res.content = JSON.stringify(req.form.errors);
       res.error(400, 'Missing Required Fields');
     } else {
       let user = req.form.getEntity();
       // Make sure user doesn't already exist.
-      let writer = new Writer();
-      writer.read('users', phone, (err, data) => {
-        if (err) {
-          res.error(400, 'A user with that phone number exists.');
-        } else {
-          // Save user to the 'DB'
-          
-        }
-      });
+      console.log("Save the user!");
 
     }
   }

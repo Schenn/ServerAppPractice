@@ -22,7 +22,7 @@ const createRouter = ()=>{
 const listen = ()=>{
   server.createConnection(env.port);
   if(env.https){
-    server.createConnection(env.https.port, env.https.key);
+    server.createConnection(env.https.port, env.https);
   }
 };
 

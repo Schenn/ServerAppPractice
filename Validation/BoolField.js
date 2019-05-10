@@ -1,14 +1,10 @@
 const Options = require("./Options/");
 const Field = require("./Field");
 
-const FieldOpts = {
-  "type": {option: Options.Instance, args:{isInstanceOf:Boolean}},
-};
-
 module.exports = class BoolField extends Field {
   constructor(){
     super();
-    this.initOptions(FieldOpts);
+    this.initOptions({});
     this.required = true;
   }
 

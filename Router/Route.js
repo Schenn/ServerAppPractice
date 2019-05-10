@@ -9,7 +9,7 @@ const secureMethods = ["PUT", "POST", "DELETE"];
  * @param {boolean} routeIsSecure
  */
 const validateSecureRequest = (req, routeIsSecure)=>{
-  if(routeIsSecure && !req.isSecure()){
+  if(routeIsSecure && !req.isSecure){
     throw new Error(`Route requires a secure connection. Connection is insecure.`);
   }
 };
@@ -129,7 +129,7 @@ module.exports = class Route {
   }
 
   get form(){
-    return this[_].routeData.hasAnnotation("form") ? this[_].routeData.getAnnotation("form")[0] : "";
+    return this[_].routeData.hasAnnotation("form") ? this[_].routeData.getAnnotation("form")[0].value : "";
   }
 
   /**
