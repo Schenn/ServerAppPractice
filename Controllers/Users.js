@@ -20,13 +20,14 @@ module.exports = class Users extends Controller {
   /**
    * @route create
    * @httpMethod post
-   * @form Forms/NewUser
+   * @form Controllers/Forms/NewUser
    * @param {module.Request} req
    * @param {module.Response} res
    */
   create(req, res) {
     if(!req.form.isValid()) {
-      res.content = JSON.stringify(req.form.errors);
+      res.content = req.form.errors;
+      res.toJson();
       res.error(400, 'Missing Required Fields');
     } else {
       let user = req.form.getEntity();

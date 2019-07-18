@@ -1,4 +1,4 @@
-const Fields = require("../Validation/");
+const Fields = require("../Forms/Validation/");
 const Entity = require("./Entity");
 
 module.exports = class User extends Entity {

@@ -16,6 +16,7 @@ server.environment = env.env;
 const createRouter = ()=>{
   let router = new Router();
   server.handler = router.handle.bind(router);
+  console.log(path.join(process.cwd(),"Controllers"));
   return router.buildCache(path.join(process.cwd(),"Controllers"));
 };
 

@@ -44,7 +44,6 @@ module.exports = class Router extends Collector {
     if(!controllerData.classDoc.hasAnnotation("classRoute")){
       controllerData.classDoc.annotationFromPhrase(`* @classRoute ${namespace.toLowerCase()}`);
     }
-
     for(let method of controllerData.methods){
       let methodData = controllerData.forMethod(method);
       if(!methodData.hasAnnotation("route")){
@@ -74,7 +73,7 @@ module.exports = class Router extends Collector {
   }
 
   /**
-   * Collect the controllers found on a given path and identify the routes that belong to it.
+   * Collect the route handlers found on a given path and identify the routes that belong to it.
    *
    * @param {string} controllerPath The parent directory for your controllers
    */

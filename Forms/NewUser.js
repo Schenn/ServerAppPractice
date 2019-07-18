@@ -1,8 +1,8 @@
 const User = require("../Entities/User");
 const Form = require("../Server/Form");
-const TextField = require("../Validation/TextField");
-const HashField = require("../Validation/HashField");
-const BoolField = require("../Validation/BoolField");
+const TextField = require("./Validation/TextField");
+const HashField = require("./Validation/HashField");
+const BoolField = require("./Validation/BoolField");
 
 module.exports = class NewUser extends Form {
   constructor(payload){

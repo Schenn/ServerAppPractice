@@ -1,0 +1,18 @@
+{
+  "name": "noderestapi",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Personal Server Project",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "schenn@gmail.com",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "mysql": "^2.17.1"
+  }
+}
