@@ -31,19 +31,18 @@ const validateHttpMethod = (req, httpMethod)=>{
 module.exports = class Route {
 
   /**
-   * @param {Metadata} controllerData
+   * @param {module.Metadata} controllerData
    * @param {string} method
    * @return {*}
    */
   constructor(controllerData, method){
-    let meta = controllerData.forMethod(method);
-    if(!meta.hasAnnotation("route")){
+    if(!method.hasAnnotation("route")){
       throw `No route provided in method data for controller ${controllerData.className} method: ${method}`;
     }
     this[_] = {
-      method: method,
+      method: method.name,
       controllerData: controllerData,
-      routeData: controllerData.forMethod(method)
+      routeData: method
     };
   }
 
@@ -128,10 +127,6 @@ module.exports = class Route {
       this[_].routeData.getAnnotation("doBefore")[0].value : "";
   }
 
-  get form(){
-    return this[_].routeData.hasAnnotation("form") ? this[_].routeData.getAnnotation("form")[0].value : "";
-  }
-
   /**
    * Does the route require a secure connection
    *
@@ -169,9 +164,6 @@ module.exports = class Route {
     let doBefore = this.doBefore;
     let hasDoBefore = doBefore !== '';
 
-    if(this.form){
-      req.useForm(this.form);
-    }
       // If the response wasn't closed by an invalid form
     if(res.isOpen() && hasDoBefore) {
       // @doBefore path/to/class::method  (e.g. game/scoreboard::addHighScore)

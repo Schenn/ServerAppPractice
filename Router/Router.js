@@ -1,5 +1,5 @@
 const cleanRegex = /^\/+|\/+$/g;
-const Collector = require("../NodeAnnotations/Collector");
+const Collector = require("NodeAnnotations/Collector");
 const Route = require("./Route");
 
 const _ = Symbol("private");
@@ -13,7 +13,9 @@ module.exports = class Router extends Collector {
   constructor(){
     super();
     this[_] = {
-      routes:{}
+      routes:{},
+      before:[],
+      onRoute:{}
     };
   }
 
@@ -33,6 +35,7 @@ module.exports = class Router extends Collector {
     }
     let routePath = `${route.httpMethod}::${cleanPath}`;
     this[_].routes[routePath] = route;
+    this[_].onRoute[routePath] = [];
   }
 
   /**
@@ -44,13 +47,10 @@ module.exports = class Router extends Collector {
     if(!controllerData.classDoc.hasAnnotation("classRoute")){
       controllerData.classDoc.annotationFromPhrase(`* @classRoute ${namespace.toLowerCase()}`);
     }
-    for(let method of controllerData.methods){
-      let methodData = controllerData.forMethod(method);
-      if(!methodData.hasAnnotation("route")){
-        continue;
+    for(doc of controllerData){
+      if(doc.type === "method" && doc.doc.hasAnnotation("route")){
+        this.addRoute(new Route(controllerData, doc));
       }
-
-      this.addRoute(new Route(controllerData, method));
     }
   }
 
@@ -87,6 +87,18 @@ module.exports = class Router extends Collector {
     });
   }
 
+  runBefore(req, res, route){
+    for(let cb of this[_].before){
+      cb(req, res, route);
+    }
+  }
+
+  runOnRoute(req, res, route){
+    for(let cb of this[_].onRoute[route.routePath]){
+      cb(req, res, route);
+    }
+  }
+
   /**
    * Get the controller for the given path and trigger the matching route handler.
    *
@@ -99,9 +111,34 @@ module.exports = class Router extends Collector {
       res.statusCode = 404;
     } else {
       route.validateRequest(req);
+      this.runBefore(req, res, route);
+      this.runOnRoute(req, res, route);
       route.handle(req, res);
     }
     res.close();
+  }
+
+  /**
+   * Add a callback to run before any routes have been triggered.
+   *  FIFO
+   * @param cb
+   */
+  beforeRouting(cb){
+    this[_].before += cb;
+  }
+
+  /**
+   * Add a callback to run before sending the request to the controller for the given route.
+   *  This lets you inject data into the request and response before it gets to the controller.
+   *
+   * @param route
+   * @param cb
+   */
+  onRoute(route, cb){
+    if(typeof this[_].onRoute[route] === "undefined"){
+      this[_].onRoute[route] = [];
+    }
+    this[_].onRoute[route] += cb;
   }
 };
 
