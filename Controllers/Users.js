@@ -10,27 +10,27 @@ module.exports = class Users extends Controller {
 
   /**
    * @route /
+   * @form Forms/NewUser
    * @param {module.Request} req
    * @param {module.Response} res
    */
   index(req, res) {
-    res.content = "Success Yo";
+    res.content = `<html><head></head><body>${req.forms.NewUser.template()}</body></html>`;
   }
 
   /**
    * @route create
    * @httpMethod post
-   * @form Controllers/Forms/NewUser
+   * @form Forms/NewUser
    * @param {module.Request} req
    * @param {module.Response} res
    */
   create(req, res) {
     if(!req.form.isValid()) {
-      res.content = req.form.errors;
-      res.toJson();
-      res.error(400, 'Missing Required Fields');
+      this.error(req, res);
     } else {
-      let user = req.form.getEntity();
+
+      //let user = req.form.getEntity();
       // Make sure user doesn't already exist.
       console.log("Save the user!");
 

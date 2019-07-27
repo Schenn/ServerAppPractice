@@ -30,4 +30,10 @@ module.exports = class Controller {
     this[_] = {
     };
   }
+
+  error(req, res){
+    res.content = req.form.errors;
+    res.toJson();
+    res.error(400, 'Missing Required Fields');
+  }
 };
