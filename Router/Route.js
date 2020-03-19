@@ -101,7 +101,7 @@ module.exports = class Route {
    * @return {string}
    */
   get routePath(){
-    return (`${this.controllerRoute}${this.subpath}`).replace("//", "/");
+    return (`${this.controllerRoute}${this.subpath}`).replace("//", "/").replace(/^(\/+)|(\/$)/g, '');
   }
 
   /**

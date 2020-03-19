@@ -1,4 +1,4 @@
-const cleanRegex = /^\/+|\/+$/g;
+const cleanRegex = /^(\/+)|(\/$)/g;
 const Collector = require("@schennco/nodeannotations/Collector");
 const Route = require("./Route");
 
@@ -111,7 +111,7 @@ module.exports = class Router extends Collector {
    * @param route
    */
   runOnRoute(req, res, route){
-    for(let cb of this[_].onRoute[route.routePath]){
+    for(let cb of this[_].onRoute[route.httpMethod + '::' + route.routePath]){
       cb(req, res, route);
     }
   }

@@ -54,7 +54,7 @@ module.exports = class Request {
    * @return {string | *}
    */
   get path(){
-    return this[_].parsedUrl.pathname.replace(/^\/+|\/+$/g , '');
+    return this[_].parsedUrl.pathname.replace(/^(\/+)|(\/$)/g , '');
   }
 
   /**

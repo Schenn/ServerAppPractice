@@ -26,8 +26,9 @@ const Response = require("./Response");
  */
 module.exports = class Controller {
 
-  constructor() {
+  constructor(database = null) {
     this[_] = {
+      database: database
     };
   }
 
