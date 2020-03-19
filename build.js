@@ -9,7 +9,7 @@ const onDone = (err)=>{
 
 let writer = new Writer();
 writer.basePath = ".cache";
-writer.dir = "/routes/";
+writer.directory = "/routes/";
 
 let cache = new RouteCollector();
 cache.buildCache(path.join(process.cwd(),"Controllers"), (routes)=>{

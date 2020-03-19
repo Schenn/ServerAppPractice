@@ -8,12 +8,14 @@
     "lib": "lib"
   },
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "schenn@gmail.com",
   "license": "UNLICENSED",
   "dependencies": {
+    "@mysql/xdevapi": "^8.0.17",
     "@schennco/nodeannotations": "^1.6.2",
-    "mysql": "^2.17.1"
+    "linq": "^3.2.2"
   }
 }

@@ -7,9 +7,8 @@ module.exports = class User {
 
   constructor(payload){
     this[_] = {
-      firstName: '',
-      lastName: '',
-      phone:  '',
+      userName: '',
+      email:  '',
       password: '',
     };
   }
@@ -17,43 +16,29 @@ module.exports = class User {
   /**
    * @return {string}
    */
-  get firstName(){
-    return this[_].firstName;
+  get userName(){
+    return this[_].userName;
   }
 
   /**
    * @param {string} name
    */
-  set firstName(name){
-    this[_].firstName = name;
+  set userName(name){
+    this[_].userName = name;
   }
 
   /**
    * @return {string}
    */
-  get lastName(){
-    return this[_].lastName;
-  }
-
-  /**
-   * @param {string} name
-   */
-  set lastName(name){
-    this[_].lastName = name;
-  }
-
-  /**
-   * @return {string}
-   */
-  get phone(){
-    return this[_].phone;
+  get email(){
+    return this[_].email;
   }
 
   /**
    * @param {string} username
    */
-  set phone(phone){
-    this[_].phone = phone;
+  set phone(email){
+    this[_].email = email;
   }
 
   /**

@@ -1,5 +1,5 @@
 const cleanRegex = /^\/+|\/+$/g;
-const Collector = require("NodeAnnotations/Collector");
+const Collector = require("@schennco/nodeannotations/Collector");
 const Route = require("./Route");
 
 const _ = Symbol("private");
@@ -47,9 +47,9 @@ module.exports = class Router extends Collector {
     if(!controllerData.classDoc.hasAnnotation("classRoute")){
       controllerData.classDoc.annotationFromPhrase(`* @classRoute ${namespace.toLowerCase()}`);
     }
-    for(doc of controllerData){
+    for(let doc of controllerData){
       if(doc.type === "method" && doc.doc.hasAnnotation("route")){
-        this.addRoute(new Route(controllerData, doc));
+        this.addRoute(new Route(controllerData, doc.doc));
       }
     }
   }
@@ -87,12 +87,29 @@ module.exports = class Router extends Collector {
     });
   }
 
+  /**
+   * Middleware to trigger before routing begins.
+   *  This middleware is triggered regardless of the requested route.
+   *
+   * @param req
+   * @param res
+   * @param route
+   */
   runBefore(req, res, route){
     for(let cb of this[_].before){
       cb(req, res, route);
     }
   }
 
+  /**
+   * Triggers the memoized methods from onRoute before the route method is called.
+   *  This middleware is triggered on specific routes which were memoized via this.onRoute.
+   *
+   * @see Router.onRoute
+   * @param req
+   * @param res
+   * @param route
+   */
   runOnRoute(req, res, route){
     for(let cb of this[_].onRoute[route.routePath]){
       cb(req, res, route);
@@ -121,6 +138,7 @@ module.exports = class Router extends Collector {
   /**
    * Add a callback to run before any routes have been triggered.
    *  FIFO
+   *
    * @param cb
    */
   beforeRouting(cb){

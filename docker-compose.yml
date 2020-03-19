@@ -1,9 +1,9 @@
 version: '3'
 services:
-  server:
+  noderestapi:
     build: .
     environment:
-      NODE_ENV: 'dockerdev'
+      NODE_ENV: 'dev'
     ports:
       - "8080:3000"
       - "8081:3001"
@@ -11,6 +11,20 @@ services:
       - ./Controllers:/app/src/Controllers
       - ./Database:/app/src/Database
       - ./Entities:/app/src/Entities
+      - ./Forms:/app/src/Forms
       - ./Router:/app/src/Router
       - ./Server:/app/src/Server
-      - ./NodeAnnotations:/app/src/NodeAnnotations
+#    command: npm install -g nodemon
+    command: npm install
+#    command: nodemon
+    command: npm start
+  sitedb:
+    image: mysql
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "6603:3306"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_USER: noderestapi
+      MYSQL_PASSWORD: noderestapi

@@ -4,12 +4,31 @@ const workingPath = (sub)=>{
   return path.join(process.cwd(),sub);
 };
 
+const dbenvironments = {
+  dev: {
+    port: 6603,
+    username: 'noderestapi',
+    password: 'noderestapi'
+  },
+  staging: {
+    port: 6603,
+    username: 'noderestapi',
+    password: 'noderestapi'
+  },
+  // This should use environment variables for production
+  production: {
+    port: 6603,
+    username: 'noderestapi',
+    password: 'noderestapi'
+  }
+};
+
 const environments = {
   local: {
     port: 3000,
     env: 'localdev'
   },
-  dockerdev: {
+  dev: {
     port: 3000,
     https: {
       port: 3001,
@@ -17,6 +36,7 @@ const environments = {
       cert: workingPath('https/cert.pem'),
       keycert: workingPath('https/key.cert')
     },
+    db: dbenvironments.dev,
     env: 'dev',
   },
   staging: {
@@ -27,6 +47,7 @@ const environments = {
       cert: workingPath('https/cert.pem'),
       keycert: workingPath('https/key.cert')
     },
+    db: dbenvironments.staging,
     env: 'staging'
   },
   production: {
@@ -37,6 +58,7 @@ const environments = {
       cert: workingPath('https/cert.pem'),
       keycert: workingPath('https/key.cert')
     },
+    db: dbenvironments.production,
     env: 'prod'
   }
 };

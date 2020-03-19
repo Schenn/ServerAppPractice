@@ -4,6 +4,12 @@ const qs = require("querystring");
 const Autoloader = require("../Server/Autoloader");
 
 const _ = Symbol("private");
+const methods = {
+  "get": "GET",
+  "put": "PUT",
+  "post": "POST",
+  "delete": "DELETE"
+};
 
 /**
  * Wrap a request object
@@ -21,8 +27,16 @@ module.exports = class Request {
       decoder: new StringDecoder('utf-8'),
       parsedUrl: url.parse(req.url, true),
       payload: '',
-      form: null
+      forms: []
     };
+  }
+
+  static get METHODS(){
+    return methods;
+  }
+
+  get METHODS(){
+    return this.constructor.METHODS;
   }
 
   /**
@@ -76,21 +90,12 @@ module.exports = class Request {
     return this[_].payload;
   }
 
-  /**
-   * Set the form which the request should carry.
-   * @param {string} targetForm
-   */
-  useForm(target){
-    let targetForm = Autoloader(target);
-    this[_].form = new targetForm(qs.parse(this[_].payload));
+  addForm(form){
+    this[_].forms += form;
   }
 
-  /**
-   * Get the form instance on the request.
-   * @return {*|null}
-   */
-  get form(){
-    return this[_].form;
+  get forms(){
+    return this[_].forms;
   }
 
   /**
