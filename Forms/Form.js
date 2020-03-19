@@ -7,7 +7,7 @@ module.exports = class Form {
     this[_] = {
       payload: payload,
       fields: {},
-      invalidFlags: {}
+      invalidFlags: {},
     };
   }
 
@@ -28,7 +28,7 @@ module.exports = class Form {
     return this[_].payload[field];
   }
 
-  getEntities(){
+  getModel(){
     throw "Abstract Method Needs Override!";
   }
 
