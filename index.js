@@ -3,7 +3,6 @@ const env = require("./config");
 
 const Server = require("./Server/Server");
 const Router = require("./Router/Router");
-const FakeDB = require("./lib/FakeDB");
 
 const server = new Server();
 server.environment = env.env;
@@ -21,18 +20,6 @@ const createRouter = ()=>{
 };
 
 /**
- * Create a temporary fake database in order to continue learning node on.
- * Once we get comfortable again, we need to replace this with mysql in docker.
- */
-const createDatabase = (router)=>{
-  let fakeDB = new FakeDB({subPath: "./.data/", fileName: 'developmentDB.json'});
-  fakeDB.connect(()=>{
-    // We need to figure out how we want to get the database to the route callback.
-    listen();
-  });
-};
-
-/**
  * Open the ports for connections.
  */
 const listen = ()=>{
@@ -44,5 +31,5 @@ const listen = ()=>{
 };
 
 createRouter().then((router)=>{
-  createDatabase(router);
+  listen();
 });
