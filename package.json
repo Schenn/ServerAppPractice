@@ -1,7 +1,7 @@
 {
   "name": "noderestapi",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Personal Server Project",
   "main": "index.js",
   "directories": {
@@ -15,7 +15,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@mysql/xdevapi": "^8.0.17",
-    "@schennco/nodeannotations": "^1.7.0",
+    "@schennco/nodeannotations": "^1.7.1",
     "linq": "^3.2.2"
   }
 }

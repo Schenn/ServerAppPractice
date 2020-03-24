@@ -28,25 +28,6 @@ const validateHttpMethod = (req, httpMethod)=>{
   }
 };
 
-/**
- * Process the controller method's doBefore.
- *
- * @param {Controller} controller
- * @param {string} doBefore  namespace for doBefore method.
- */
-const processDoBefore = (controller, doBefore, dependencies={})=>{
-  // @doBefore path/to/class::method  (e.g. game/scoreboard::addHighScore)
-  if (doBefore.indexOf("\\") === -1) {
-    // If the doBefore does not reference a namespace, treat as same controller instance.
-    controller[doBefore](req, res, dependencies);
-  } else {
-    let namespacedDoBefore = doBefore.split("::");
-    let targetClass = Autoloader(namespacedDoBefore[0]);
-    let target = new targetClass();
-    target[namespacedDoBefore[1]](req, res, dependencies);
-  }
-};
-
 module.exports = class Route {
 
   /**
@@ -169,21 +150,29 @@ module.exports = class Route {
    * Instantiates dependencies
    *  Available to do other route argument preperations before the handler chain begins.
    */
-  init(){
+  prepareDependencies(req){
     for(let [name, target] of Object.entries(this[_].dependsOn)){
-      this[_].dependsOn[name] = new target();
+      if(req.httpMethod === "GET"){
+        this[_].dependencies[name] = (req.query === "") ?
+          new target() :
+          new target(req.query);
+      } else {
+        this[_].dependencies[name] = (typeof req.payload[name] !== "undefined") ?
+          new target(req.payload[name]) :
+          new target(req.payload);
+      }
     }
   }
 
   get dependencies(){
-    return this[_].dependsOn;
+    return this[_].dependencies;
   }
 
   getDependency(name){
-    return this[_].dependsOn[name];
+    return this[_].dependencies[name];
   }
 
-  prepareDependencies(){
+  cacheDependencies(){
     let dependencies = (this[_].routeData.hasAnnotation("depends")) ?
       this[_].routeData.getAnnotation("depends") : [];
     dependencies.forEach((dependencyTag)=>{
@@ -221,14 +210,22 @@ module.exports = class Route {
   handle(req, res){
     let controller = this.controller;
     let doBefore = this.doBefore;
-    let hasDoBefore = doBefore !== '';
 
       // If the response wasn't closed by an invalid form
-    if(res.isOpen() && hasDoBefore) {
-      processDoBefore(controller, doBefore, this.dependencies);
+    if(res.isOpen() && doBefore !== '') {
+      // @doBefore path/to/class::method  (e.g. game/scoreboard::addHighScore)
+      if (doBefore.indexOf("\\") === -1) {
+        // If the doBefore does not reference a namespace, treat as same controller instance.
+        controller[doBefore](req, res, this.dependencies);
+      } else {
+        let namespacedDoBefore = doBefore.split("::");
+        let targetClass = Autoloader(namespacedDoBefore[0]);
+        let target = new targetClass();
+        target[namespacedDoBefore[1]](req, res, this.dependencies);
+      }
     }
 
-    // If the response wasn't closed by an error, keep processing.
+    // If the response wasn't closed by an error, trigger the controller callback.
     if(res.isOpen()){
       // call the route handler
       controller[this.method](req, res, this.dependencies);
@@ -238,7 +235,7 @@ module.exports = class Route {
       }
     }
 
-    // request processed succesfully.  close the response to the client.
+    // If the request wasn't closed by an error, it processed succesfully.  close the response to the client.
     if(res.isOpen()){
       res.close();
     }

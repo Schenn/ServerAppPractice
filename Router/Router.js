@@ -34,7 +34,7 @@ module.exports = class Router extends Collector {
       cleanPath = "/";
     }
     let routePath = `${route.httpMethod}::${cleanPath}`;
-    route.prepareDependencies();
+    route.cacheDependencies();
     this[_].routes[routePath] = route;
     this[_].onRoute[routePath] = [];
   }
@@ -48,6 +48,7 @@ module.exports = class Router extends Collector {
     if(!controllerData.classDoc.hasAnnotation("classRoute")){
       controllerData.classDoc.annotationFromPhrase(`* @classRoute ${namespace.toLowerCase()}`);
     }
+
     for(let doc of controllerData){
       if(doc.type === "method" && doc.doc.hasAnnotation("route")){
         this.addRoute(new Route(controllerData, doc.doc));
@@ -129,7 +130,7 @@ module.exports = class Router extends Collector {
       res.statusCode = 404;
     } else {
       route.validateRequest(req);
-      route.init();
+      route.prepareDependencies(req);
       this.runBefore(req, res, route);
       this.runOnRoute(req, res, route);
       route.handle(req, res);

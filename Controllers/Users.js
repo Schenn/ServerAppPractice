@@ -25,7 +25,7 @@ module.exports = class Users extends Controller {
    * @param {module.Request} req
    * @param {module.Response} res
    */
-  create(req, res, {newuserform}) {
+  create(req, res, newuserform) {
     console.log(req.payload);
     console.log(newuserform.getModel());
     if(!newuserform.isValid()) {
