@@ -15,7 +15,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@mysql/xdevapi": "^8.0.17",
-    "@schennco/nodeannotations": "^1.6.2",
+    "@schennco/nodeannotations": "^1.7.0",
     "linq": "^3.2.2"
   }
 }
