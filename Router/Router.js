@@ -34,6 +34,7 @@ module.exports = class Router extends Collector {
       cleanPath = "/";
     }
     let routePath = `${route.httpMethod}::${cleanPath}`;
+    route.prepareDependencies();
     this[_].routes[routePath] = route;
     this[_].onRoute[routePath] = [];
   }
@@ -128,6 +129,7 @@ module.exports = class Router extends Collector {
       res.statusCode = 404;
     } else {
       route.validateRequest(req);
+      route.init();
       this.runBefore(req, res, route);
       this.runOnRoute(req, res, route);
       route.handle(req, res);

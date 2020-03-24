@@ -27,7 +27,7 @@ module.exports = class Request {
       decoder: new StringDecoder('utf-8'),
       parsedUrl: url.parse(req.url, true),
       payload: '',
-      forms: []
+      dependencies: {}
     };
   }
 
@@ -90,13 +90,7 @@ module.exports = class Request {
     return this[_].payload;
   }
 
-  addForm(form){
-    this[_].forms += form;
-  }
 
-  get forms(){
-    return this[_].forms;
-  }
 
   /**
    * Start listening for data and end events. When the request has finished parsing, trigger the onReady callback which

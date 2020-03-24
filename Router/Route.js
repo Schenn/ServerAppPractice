@@ -28,6 +28,25 @@ const validateHttpMethod = (req, httpMethod)=>{
   }
 };
 
+/**
+ * Process the controller method's doBefore.
+ *
+ * @param {Controller} controller
+ * @param {string} doBefore  namespace for doBefore method.
+ */
+const processDoBefore = (controller, doBefore, dependencies={})=>{
+  // @doBefore path/to/class::method  (e.g. game/scoreboard::addHighScore)
+  if (doBefore.indexOf("\\") === -1) {
+    // If the doBefore does not reference a namespace, treat as same controller instance.
+    controller[doBefore](req, res, dependencies);
+  } else {
+    let namespacedDoBefore = doBefore.split("::");
+    let targetClass = Autoloader(namespacedDoBefore[0]);
+    let target = new targetClass();
+    target[namespacedDoBefore[1]](req, res, dependencies);
+  }
+};
+
 module.exports = class Route {
 
   /**
@@ -42,7 +61,9 @@ module.exports = class Route {
     this[_] = {
       method: method.name,
       controllerData: controllerData,
-      routeData: method
+      routeData: method,
+      dependsOn: {},
+      dependencies: {}
     };
   }
 
@@ -101,7 +122,11 @@ module.exports = class Route {
    * @return {string}
    */
   get routePath(){
-    return (`${this.controllerRoute}${this.subpath}`).replace("//", "/").replace(/^(\/+)|(\/$)/g, '');
+    let path = (`${this.controllerRoute}${this.subpath}`).replace("//", "/").replace(/^(\/+)|(\/$)/g, '');
+    if(path === ""){
+      path = "/";
+    }
+    return  path;
   }
 
   /**
@@ -136,9 +161,43 @@ module.exports = class Route {
     return ((this[_].routeData.hasAnnotation("https")) || (secureMethods.includes(this.httpMethod)));
   }
 
+  addDependency(name, thing){
+    this[_].dependsOn[name] = thing;
+  }
+
+  /**
+   * Instantiates dependencies
+   *  Available to do other route argument preperations before the handler chain begins.
+   */
+  init(){
+    for(let [name, target] of Object.entries(this[_].dependsOn)){
+      this[_].dependsOn[name] = new target();
+    }
+  }
+
+  get dependencies(){
+    return this[_].dependsOn;
+  }
+
+  getDependency(name){
+    return this[_].dependsOn[name];
+  }
+
+  prepareDependencies(){
+    let dependencies = (this[_].routeData.hasAnnotation("depends")) ?
+      this[_].routeData.getAnnotation("depends") : [];
+    dependencies.forEach((dependencyTag)=>{
+      let className = dependencyTag.type;
+      let name = dependencyTag.value;
+      let targetClass = Autoloader(className);
+      this.addDependency(name, targetClass);
+    });
+  }
+
+
   /**
    * Validate that the request meets the requirements of the route
-   *
+   *  Adds any needed dependencies to the request object.
    * @param {Request} req
    */
   validateRequest(req){
@@ -166,27 +225,20 @@ module.exports = class Route {
 
       // If the response wasn't closed by an invalid form
     if(res.isOpen() && hasDoBefore) {
-      // @doBefore path/to/class::method  (e.g. game/scoreboard::addHighScore)
-      if (doBefore.indexOf("\\") === -1) {
-        // If the doBefore does not reference a namespace, treat as same controller instance.
-        controller[doBefore](req, res);
-      } else {
-        let namespacedDoBefore = doBefore.split("::");
-        let targetClass = Autoloader(namespacedDoBefore[0]);
-        let target = new targetClass();
-        target[namespacedDoBefore[1]](req, res);
-      }
+      processDoBefore(controller, doBefore, this.dependencies);
     }
 
-    // If the response wasn't closed by an error in the same class method referenced in the dobefore,
-    //  or if there is no doBefore method specified.
+    // If the response wasn't closed by an error, keep processing.
     if(res.isOpen()){
-      controller[this.method](req, res);
+      // call the route handler
+      controller[this.method](req, res, this.dependencies);
+      // convert the response to json if its tagged to be json
       if (this[_].routeData.hasAnnotation("json")) {
         res.toJson();
       }
     }
 
+    // request processed succesfully.  close the response to the client.
     if(res.isOpen()){
       res.close();
     }
