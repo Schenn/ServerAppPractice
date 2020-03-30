@@ -19,10 +19,7 @@ module.exports = class BoolField extends Field {
   }
 
   isValid(){
-    if(this.is){
-      return (this.value === "1" || this.value === "true" || this.value === 1 || this.value === true);
-    } else {
-      return (this.value === "0" || this.value === "false" || this.value === 0 || this.value === false);
-    }
+    // If true required, check for value 'on'. If false, check if value is not 'on'.
+    return (this.is) ? this.value === "on" : this.value !== "on";
   }
 };

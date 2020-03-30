@@ -7,9 +7,17 @@ module.exports = class Field {
     this[_] = {
       name: '',
       value: '',
-      options: {},
-
+      label: '',
+      options: new Map(),
     };
+  }
+
+  set name(name){
+    this[_].name = name;
+  }
+
+  get name(){
+    return this[_].name;
   }
 
   set value(value){
@@ -20,6 +28,14 @@ module.exports = class Field {
     return this[_].value;
   }
 
+  get label(){
+    return this[_].label;
+  }
+
+  set label(label){
+    this[_].label = label;
+  }
+
   set required(required){
     if(required && typeof this[_].options.required === "undefined"){
       // If setting to true, and not already, make required.
@@ -28,7 +44,6 @@ module.exports = class Field {
       // If setting to false, and currently true, unrequire.
       delete this[_].options.required;
     }
-
   }
 
   addOption(optionName, option){
@@ -38,7 +53,7 @@ module.exports = class Field {
         target[arg] = option.args[arg];
       }
     }
-    this[_].options[optionName] = target;
+    this[_].options.set(optionName, target);
   }
 
   initOptions(options){
@@ -48,13 +63,19 @@ module.exports = class Field {
   }
 
   getOption (opt){
-    return this[_].options[opt];
+    return this[_].options.get(opt);
+  }
+
+  /**
+   * @abstract
+   */
+  get html() {
+    throw new Error(`Abstract Property Called. ${this.constructor.name} Needs HTML`);
   }
 
   isValid(){
     let valid;
-    for(let opt in this[_].options){
-      let option = this[_].options[opt];
+    for(let [opt, option] of this[_].options){
       valid = option.isValid(this.value);
       if(!valid){
         break;

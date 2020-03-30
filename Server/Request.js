@@ -90,8 +90,6 @@ module.exports = class Request {
     return this[_].payload;
   }
 
-
-
   /**
    * Start listening for data and end events. When the request has finished parsing, trigger the onReady callback which
    *  should route the request to an appropriate handler.
@@ -104,6 +102,17 @@ module.exports = class Request {
     });
     this[_].req.on('end', ()=>{
       this[_].payload += this[_].decoder.end();
+      switch(this[_].req.headers['content-type']){
+        case 'application/json':
+          this[_].payload = JSON.parse(this[_].payload);
+          break;
+        case 'multipart/form-data':
+          this[_].payload = qs.parse(this[_].payload);
+          break;
+        default:
+          // leave it alone
+          break;
+      }
       onReady();
     });
   }

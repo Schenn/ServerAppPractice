@@ -6,7 +6,7 @@ module.exports = class Form {
   constructor(payload){
     this[_] = {
       payload: payload,
-      fields: {},
+      fields: new Map(),
       invalidFlags: {},
     };
   }
@@ -19,24 +19,27 @@ module.exports = class Form {
    * @return {module.Form}
    */
   addField(field, validators){
-    this[_].fields[field] = validators;
+    this[_].fields.set(field, validators);
 
     return this;
+  }
+
+  payload(){
+    return this[_].payload;
   }
 
   getField(field){
     return this[_].payload[field];
   }
 
-  getModel(){
+  get Model(){
     throw "Abstract Method Needs Override!";
   }
 
   isValid(){
     let valid = true;
-    this[_].invalidFlags = [];
-    for(let field in this[_].fields){
-      let validators = this[_].fields[field];
+    this[_].invalidFlags = {};
+    for(let [field, validators] of this[_].fields){
       for(let validator of validators){
         validator.value = this[_].payload[field];
         if(!validator.isValid()){
@@ -44,7 +47,7 @@ module.exports = class Form {
           if(typeof this[_].invalidFlags[field] === "undefined"){
             this[_].invalidFlags[field] = [];
           }
-          this[_].invalidFlags[field].push(`${field} validator ${validator.name}- failed with value: ${this[_].payload[field]}`);
+          this[_].invalidFlags[field].push(`${field} validator - failed with value: ${this[_].payload[field]}`);
         }
       }
     }
@@ -65,7 +68,26 @@ module.exports = class Form {
    *
    * @return {string}
    */
-  getTemplate(){
+  template(){
     return '';
+  }
+
+  formHandler(){
+    return ((e) =>{
+      e.preventDefault();
+      e.stopPropagation();
+      let form = e.target;
+      let formData = new FormData(form);
+      fetch(form.getAttribute("action"), {
+        method: form.getAttribute("method"),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(formData.entries()))
+      }).then((response)=>{return response.json()}).then((data) => {
+        console.log(data);
+      });
+      return false;
+    }).toString();
   }
 };

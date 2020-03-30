@@ -32,9 +32,9 @@ const environments = {
     port: 3000,
     https: {
       port: 3001,
-      key: workingPath('https/key.pem'),
-      cert: workingPath('https/cert.pem'),
-      keycert: workingPath('https/key.cert')
+      key: workingPath('https/schennco.dev.key.pem'),
+      cert: workingPath('https/schennco.dev.crt.pem'),
+      keycert: workingPath('https/schennco.dev.crt')
     },
     db: dbenvironments.dev,
     env: 'dev',
@@ -43,9 +43,9 @@ const environments = {
     port: 5000,
     https: {
       port: 5001,
-      key: workingPath('https/key.pem'),
-      cert: workingPath('https/cert.pem'),
-      keycert: workingPath('https/key.cert')
+      key: workingPath('https/schennco.dev.key.pem'),
+      cert: workingPath('https/schennco.dev.crt.pem'),
+      keycert: workingPath('https/schennco.dev.crt')
     },
     db: dbenvironments.staging,
     env: 'staging'
@@ -54,9 +54,9 @@ const environments = {
     port: 80,
     https: {
       port: 443,
-      key: workingPath('https/key.pem'),
-      cert: workingPath('https/cert.pem'),
-      keycert: workingPath('https/key.cert')
+      key: workingPath('https/schennco.dev.key.pem'),
+      cert: workingPath('https/schennco.dev.crt.pem'),
+      keycert: workingPath('https/schennco.dev.crt')
     },
     db: dbenvironments.production,
     env: 'prod'

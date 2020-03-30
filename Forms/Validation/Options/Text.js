@@ -7,7 +7,8 @@ module.exports = class Text extends Option {
   }
 
   isValid(value){
-    return (this.pattern === null) ? true:
-      new RegExp(this.pattern).test(value);
+    // no pattern to match, so its ok.
+    return (this.pattern === null) ? true :
+      this.pattern.test(value);
   }
 };

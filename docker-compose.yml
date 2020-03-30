@@ -4,6 +4,7 @@ services:
     build: .
     environment:
       NODE_ENV: 'dev'
+      HOSTNAME: "schennco.dev"
     ports:
       - "8080:3000"
       - "8081:3001"
@@ -14,7 +15,6 @@ services:
       - ./Forms:/app/src/Forms
       - ./Router:/app/src/Router
       - ./Server:/app/src/Server
-#      - ./node_modules:/app/src/node_modules
 #    command: npm install -g nodemon
     command: npm install
 #    command: nodemon

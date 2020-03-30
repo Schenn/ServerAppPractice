@@ -5,7 +5,6 @@ module.exports = class FormManager{
 
   constructor() {
     this[_] = {
-
     };
   }
 

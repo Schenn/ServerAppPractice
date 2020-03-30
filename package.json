@@ -16,6 +16,12 @@
   "dependencies": {
     "@mysql/xdevapi": "^8.0.17",
     "@schennco/nodeannotations": "^1.7.1",
-    "linq": "^3.2.2"
+    "linq": "^3.2.2",
+    "canvas": "^2.5.0"
+  },
+  "devDependencies": {
+    "jest": "^25.2.3",
+    "bufferutil": "^4.0.1",
+    "utf-8-validate": "^5.0.2"
   }
 }

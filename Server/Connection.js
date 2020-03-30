@@ -40,7 +40,9 @@ module.exports = class Connection {
    */
   open(onListening = null){
     if(!onListening){
-      onListening = ()=>{console.log(`Connection created on port: ${this.port}`)};
+      onListening = ()=>{
+        console.log(`Connection created on port: ${this.port}`)
+      };
     }
 
     this.setServer(http.createServer(this.handler), onListening);

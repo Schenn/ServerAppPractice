@@ -5,11 +5,11 @@ const _ = Symbol("private");
  */
 module.exports = class User {
 
-  constructor(payload){
+  constructor({userName='', email='', password=''}){
     this[_] = {
-      userName: '',
-      email:  '',
-      password: '',
+      userName: userName,
+      email:  email,
+      password: password,
     };
   }
 

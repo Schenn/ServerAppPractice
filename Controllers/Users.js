@@ -21,18 +21,21 @@ module.exports = class Users extends Controller {
   /**
    * @route create
    * @httpMethod post
+   * @json
    * @depends {Forms/NewUser} newuserform
    * @param {module.Request} req
    * @param {module.Response} res
    */
-  create(req, res, newuserform) {
-    console.log(req.payload);
-    console.log(newuserform.getModel());
+  create(req, res, {newuserform}) {
     if(!newuserform.isValid()) {
       this.error(req, res, newuserform);
     } else {
-      //let user = req.form.getEntity();
+      let user = newuserform.Model;
       // Make sure user doesn't already exist.
+
+      // If the user exists, update the entry
+
+      // Otherwise, create it.
       console.log("Save the user!");
 
     }

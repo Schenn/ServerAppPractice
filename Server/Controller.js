@@ -32,9 +32,9 @@ module.exports = class Controller {
     };
   }
 
-  error(req, res){
-    res.content = req.form.errors;
+  error(req, res, form){
+    res.content = form.errors;
     res.toJson();
-    res.error(400, 'Missing Required Fields');
+    res.error(400, 'Invalid Field Data');
   }
 };
