@@ -2,11 +2,8 @@ const Option = require("./Option");
 
 module.exports = class Size extends Option {
 
-  constructor(){
-    super();
-    this.min = 0;
-    this.max = 0;
-  }
+  min = 0;
+  max = 0;
 
   isValid(value) {
     if(typeof value === "undefined"){

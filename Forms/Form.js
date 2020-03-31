@@ -1,14 +1,15 @@
 const _ = Symbol("private");
 module.exports = class Form {
+
+  #payload = "";
+  #fields = new Map();
+  #invalidFlags = {};
+
   /**
    * @param payload Post data.
    */
   constructor(payload){
-    this[_] = {
-      payload: payload,
-      fields: new Map(),
-      invalidFlags: {},
-    };
+    this.#payload = payload;
   }
 
   /**
@@ -19,17 +20,16 @@ module.exports = class Form {
    * @return {module.Form}
    */
   addField(field, validators){
-    this[_].fields.set(field, validators);
-
+    this.#fields.set(field, validators);
     return this;
   }
 
-  payload(){
-    return this[_].payload;
+  get payload(){
+    return this.#payload;
   }
 
   getField(field){
-    return this[_].payload[field];
+    return this.#payload[field];
   }
 
   get Model(){
@@ -38,16 +38,16 @@ module.exports = class Form {
 
   isValid(){
     let valid = true;
-    this[_].invalidFlags = {};
-    for(let [field, validators] of this[_].fields){
+    this.#invalidFlags = {};
+    for(let [field, validators] of this.#fields){
       for(let validator of validators){
-        validator.value = this[_].payload[field];
+        validator.value = this.#payload[field];
         if(!validator.isValid()){
           valid = false;
-          if(typeof this[_].invalidFlags[field] === "undefined"){
-            this[_].invalidFlags[field] = [];
+          if(typeof this.#invalidFlags[field] === "undefined"){
+            this.#invalidFlags[field] = [];
           }
-          this[_].invalidFlags[field].push(`${field} validator - failed with value: ${this[_].payload[field]}`);
+          this.#invalidFlags[field].push(`${field} validator - failed with value: ${this.#payload[field]}`);
         }
       }
     }
@@ -60,7 +60,7 @@ module.exports = class Form {
    * @return {invalidFlags|{}|Array}
    */
   get errors(){
-    return this[_].invalidFlags;
+    return this.#invalidFlags;
   }
 
   /**

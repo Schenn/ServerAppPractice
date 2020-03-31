@@ -1,10 +1,7 @@
 const Option = require("./Option");
 
 module.exports = class Text extends Option {
-  constructor(){
-    super();
-    this.pattern = null;
-  }
+  pattern = null;
 
   isValid(value){
     // no pattern to match, so its ok.

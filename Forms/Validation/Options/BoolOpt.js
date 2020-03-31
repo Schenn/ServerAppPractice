@@ -1,9 +1,11 @@
 const Option = require("./Option");
 
 module.exports = class BoolOpt extends Option {
+
+  is = true;
+
   constructor(){
     super();
-    this.is = true;
   }
 
   isValid(value){

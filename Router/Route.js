@@ -1,5 +1,4 @@
 const Autoloader = require("../Server/Autoloader");
-const _ = Symbol("private");
 const secureMethods = ["PUT", "POST", "DELETE"];
 
 /**
@@ -30,6 +29,12 @@ const validateHttpMethod = (req, httpMethod)=>{
 
 module.exports = class Route {
 
+  #method = '';
+  #controllerData = null;
+  #routeData = null;
+  #dependsOn = {};
+  #dependencies = {};
+
   /**
    * @param {module.Metadata} controllerData
    * @param {string} method
@@ -39,13 +44,8 @@ module.exports = class Route {
     if(!method.hasAnnotation("route")){
       throw `No route provided in method data for controller ${controllerData.className} method: ${method}`;
     }
-    this[_] = {
-      method: method.name,
-      controllerData: controllerData,
-      routeData: method,
-      dependsOn: {},
-      dependencies: {}
-    };
+    this.#method = method.name;
+    this.#controllerData = controllerData;
   }
 
   /**
@@ -54,7 +54,7 @@ module.exports = class Route {
    * @return {string}
    */
   get controllerRoute(){
-    return this[_].controllerData.classDoc.getAnnotation("classRoute")[0].value;
+    return this.#controllerData.classDoc.getAnnotation("classRoute")[0].value;
   }
 
   /**
@@ -63,7 +63,7 @@ module.exports = class Route {
    * @return {string}
    */
   get subpath(){
-    let routePath = this[_].routeData.getAnnotation("route")[0].value;
+    let routePath = this.#routeData.getFirstAnnotationValue("route");
     if(routePath[0] !== "/"){
       routePath = "/" + routePath;
     }
@@ -76,7 +76,7 @@ module.exports = class Route {
    * @return {*}
    */
   get controller(){
-    return this[_].controllerData.getInstance();
+    return this.#controllerData.getInstance();
   }
 
   /**
@@ -85,7 +85,7 @@ module.exports = class Route {
    * @return {*|string}
    */
   get method(){
-    return this[_].method;
+    return this.#method;
   }
 
   /**
@@ -94,7 +94,7 @@ module.exports = class Route {
    * @return {*|Object}
    */
   get controllerData(){
-    return this[_].controllerData;
+    return this.#controllerData;
   }
 
   /**
@@ -103,11 +103,12 @@ module.exports = class Route {
    * @return {string}
    */
   get routePath(){
-    let path = (`${this.controllerRoute}${this.subpath}`).replace("//", "/").replace(/^(\/+)|(\/$)/g, '');
+    let path = (`${this.controllerRoute}${this.subpath}`).replace("//", "/")
+      .replace(/^(\/+)|(\/$)/g, '');
     if(path === ""){
       path = "/";
     }
-    return  path;
+    return path;
   }
 
   /**
@@ -116,8 +117,8 @@ module.exports = class Route {
    * @return {string}
    */
   get httpMethod(){
-    return this[_].routeData.hasAnnotation("httpMethod") ?
-      this[_].routeData.getAnnotation("httpMethod")[0].value.toUpperCase() : "GET";
+    return this.#routeData.hasAnnotation("httpMethod") ?
+      this.#routeData.getFirstAnnotationValue("httpMethod").toUpperCase() : "GET";
   }
 
   /**
@@ -129,8 +130,8 @@ module.exports = class Route {
    * @return {string}
    */
   get doBefore(){
-    return this[_].routeData.hasAnnotation("doBefore") ?
-      this[_].routeData.getAnnotation("doBefore")[0].value : "";
+    return this.#routeData.hasAnnotation("doBefore") ?
+      this.#routeData.getFirstAnnotationValue("doBefore") : "";
   }
 
   /**
@@ -139,11 +140,11 @@ module.exports = class Route {
    * @return {boolean}
    */
   isSecure(){
-    return ((this[_].routeData.hasAnnotation("https")) || (secureMethods.includes(this.httpMethod)));
+    return ((this.#routeData.hasAnnotation("https")) || (secureMethods.includes(this.httpMethod)));
   }
 
   addDependency(name, thing){
-    this[_].dependsOn[name] = thing;
+    this.#dependsOn[name] = thing;
   }
 
   /**
@@ -151,13 +152,13 @@ module.exports = class Route {
    *  Available to do other route argument preperations before the handler chain begins.
    */
   prepareDependencies(req){
-    for(let [name, target] of Object.entries(this[_].dependsOn)){
+    for(let [name, target] of Object.entries(this.#dependsOn)){
       if(req.httpMethod === "GET"){
-        this[_].dependencies[name] = (req.query === "") ?
+        this.#dependencies[name] = (req.query === "") ?
           new target() :
           new target(req.query);
       } else {
-        this[_].dependencies[name] = (typeof req.payload[name] !== "undefined") ?
+        this.#dependencies[name] = (typeof req.payload[name] !== "undefined") ?
           new target(req.payload[name]) :
           new target(req.payload);
       }
@@ -165,16 +166,16 @@ module.exports = class Route {
   }
 
   get dependencies(){
-    return this[_].dependencies;
+    return this.#dependencies;
   }
 
   getDependency(name){
-    return this[_].dependencies[name];
+    return this.#dependencies[name];
   }
 
   cacheDependencies(){
-    let dependencies = (this[_].routeData.hasAnnotation("depends")) ?
-      this[_].routeData.getAnnotation("depends") : [];
+    let dependencies = (this.#routeData.hasAnnotation("depends")) ?
+      this.#routeData.getAnnotation("depends") : [];
     dependencies.forEach((dependencyTag)=>{
       let className = dependencyTag.type;
       let name = dependencyTag.value;
@@ -230,7 +231,7 @@ module.exports = class Route {
       // call the route handler
       controller[this.method](req, res, this.dependencies);
       // convert the response to json if its tagged to be json
-      if (this[_].routeData.hasAnnotation("json")) {
+      if (this.#routeData.hasAnnotation("json")) {
         res.toJson();
       }
     }

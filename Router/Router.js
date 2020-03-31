@@ -2,22 +2,15 @@ const cleanRegex = /^(\/+)|(\/$)/g;
 const Collector = require("@schennco/nodeannotations/Collector");
 const Route = require("./Route");
 
-const _ = Symbol("private");
-
 /**
  * Handle redirecting routes to class methods.
  *
  * @type {module.Router}
  */
 module.exports = class Router extends Collector {
-  constructor(){
-    super();
-    this[_] = {
-      routes:{},
-      before:[],
-      onRoute:{}
-    };
-  }
+  #routes = {};
+  #before = [];
+  #onRoute = {};
 
   /**
    * Add a route to the router.
@@ -35,8 +28,8 @@ module.exports = class Router extends Collector {
     }
     let routePath = `${route.httpMethod}::${cleanPath}`;
     route.cacheDependencies();
-    this[_].routes[routePath] = route;
-    this[_].onRoute[routePath] = [];
+    this.#routes[routePath] = route;
+    this.#onRoute[routePath] = [];
   }
 
   /**
@@ -69,8 +62,8 @@ module.exports = class Router extends Collector {
       cleanPath = "/";
     }
     let path = `${req.httpMethod}::${cleanPath}`;
-    return this[_].routes[path] ?
-      this[_].routes[path] :
+    return this.#routes[path] ?
+      this.#routes[path] :
       null;
   }
 
@@ -98,7 +91,7 @@ module.exports = class Router extends Collector {
    * @param route
    */
   runBefore(req, res, route){
-    for(let cb of this[_].before){
+    for(let cb of this.#before){
       cb(req, res, route);
     }
   }
@@ -113,7 +106,7 @@ module.exports = class Router extends Collector {
    * @param route
    */
   runOnRoute(req, res, route){
-    for(let cb of this[_].onRoute[route.httpMethod + '::' + route.routePath]){
+    for(let cb of this.#onRoute[route.httpMethod + '::' + route.routePath]){
       cb(req, res, route);
     }
   }
@@ -145,7 +138,7 @@ module.exports = class Router extends Collector {
    * @param cb
    */
   beforeRouting(cb){
-    this[_].before += cb;
+    this.#before += cb;
   }
 
   /**
@@ -156,10 +149,10 @@ module.exports = class Router extends Collector {
    * @param cb
    */
   onRoute(route, cb){
-    if(typeof this[_].onRoute[route] === "undefined"){
-      this[_].onRoute[route] = [];
+    if(typeof this.#onRoute[route] === "undefined"){
+      this.#onRoute[route] = [];
     }
-    this[_].onRoute[route] += cb;
+    this.#onRoute[route] += cb;
   }
 };
 

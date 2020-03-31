@@ -1,23 +1,22 @@
 const http = require("http");
 const fs = require("fs");
 
-const _ = Symbol("private");
-
 module.exports = class Connection {
+  #port = '';
+  #handler = ()=>{};
+  #server = null;
+
   /**
    * @param {number} port
    * @param {function} handler
    */
   constructor(port, handler=(req, res)=>{console.log("Heard Request.");}) {
-    this[_] = {
-      port: port,
-      handler: handler,
-      server: null,
-    };
+    this.#port = port;
+    this.#handler = handler;
   }
 
   get handler(){
-    return this[_].handler;
+    return this.#handler;
   }
 
   /**
@@ -25,12 +24,12 @@ module.exports = class Connection {
    * @return {*|number}
    */
   get port(){
-    return this[_].port;
+    return this.#port;
   }
 
   setServer(server, onListening){
-    this[_].server = server;
-    this[_].server.listen(this[_].port, onListening);
+    this.#server = server;
+    this.#server.listen(this.#port, onListening);
   }
 
   /**
@@ -41,10 +40,10 @@ module.exports = class Connection {
   open(onListening = null){
     if(!onListening){
       onListening = ()=>{
-        console.log(`Connection created on port: ${this.port}`)
+        console.log(`Connection created on port: ${this.#port}`)
       };
     }
 
-    this.setServer(http.createServer(this.handler), onListening);
+    this.setServer(http.createServer(this.#handler), onListening);
   }
 };

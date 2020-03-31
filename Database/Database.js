@@ -7,28 +7,28 @@ const _ = Symbol("private");
  */
 class Database {
 
+  #connArgs = {};
+  #connection = null;
+  #errors = [];
+
   /**
    *
    * @param {}connectionArgs
    */
   constructor(connectionArgs){
-    this[_] = {
-      connArgs: connectionArgs,
-      connection: null,
-      errors: []
-    };
+    this.#connArgs = connectionArgs;
   }
 
   get connection(){
-    return this[_].connection;
+    return this.#connection;
   }
 
   get errors(){
-    return this[_].errors;
+    return this.#errors;
   }
 
   addError(err){
-    this[_].errors.push(err);
+    this.#errors.push(err);
     console.log(err);
   }
 
@@ -38,15 +38,15 @@ class Database {
    * @return {string}
    */
   connectionParam(name){
-    if(!this[_].connArgs){
+    if(!this.#connArgs){
       this.addError("No Connection arguments passed to Database.");
     }
 
-    if(typeof this[_].connArgs[name] === "undefined"){
+    if(typeof this.#connArgs[name] === "undefined"){
       this.addError(`${name} is not a property in the database connection arguments.`);
     }
 
-    return this[_].connArgs[name];
+    return this.#connArgs[name];
   }
 
   /**

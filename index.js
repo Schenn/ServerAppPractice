@@ -4,20 +4,11 @@ const env = require("./config");
 const Server = require("./Server/Server");
 const Router = require("./Router/Router");
 
-const server = new Server();
-server.environment = env.env;
+let router = new Router();
 
-/**
- * A Router is a class which interprets incoming paths and intelligently passes the request to the appropriate handler.
- *
- *  Assigns the router handler to the server handler.
- * @return {Promise}
- */
-const createRouter = ()=>{
-  let router = new Router();
-  server.handler = router.handle.bind(router);
-  return router.buildCache(path.join(process.cwd(),"Controllers"));
-};
+const server = new Server();
+server.handler = router.handle.bind(router);
+server.environment = env.env;
 
 /**
  * Open the ports for connections.
@@ -30,6 +21,6 @@ const listen = ()=>{
 
 };
 
-createRouter().then((router)=>{
+router.buildCache(path.join(process.cwd(),"Controllers")).then((router)=>{
   listen();
 });

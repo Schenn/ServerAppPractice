@@ -1,4 +1,3 @@
-const _ = Symbol("private");
 const Response = require("./Response");
 
 /**
@@ -26,10 +25,7 @@ const Response = require("./Response");
  */
 module.exports = class Controller {
 
-  constructor(database = null) {
-    this[_] = {
-      database: database
-    };
+  constructor() {
   }
 
   error(req, res, form){

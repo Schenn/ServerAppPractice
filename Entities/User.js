@@ -5,53 +5,34 @@ const _ = Symbol("private");
  */
 module.exports = class User {
 
+  userName = "";
+  #email = "";
+  #password = "";
+
   constructor({userName='', email='', password=''}){
-    this[_] = {
-      userName: userName,
-      email:  email,
-      password: password,
-    };
-  }
-
-  /**
-   * @return {string}
-   */
-  get userName(){
-    return this[_].userName;
-  }
-
-  /**
-   * @param {string} name
-   */
-  set userName(name){
-    this[_].userName = name;
+    this.userName = userName;
+    this.#email = email;
+    this.#password = password;
   }
 
   /**
    * @return {string}
    */
   get email(){
-    return this[_].email;
-  }
-
-  /**
-   * @param {string} username
-   */
-  set phone(email){
-    this[_].email = email;
+    return this.#email;
   }
 
   /**
    * @return {string}
    */
   get password(){
-    return this[_].password;
+    return this.#password;
   }
 
   /**
    * @param {string} password
    */
   set password(password){
-    this[_].password = password;
+    this.#password = password;
   }
 };

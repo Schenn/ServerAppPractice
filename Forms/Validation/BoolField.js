@@ -2,11 +2,8 @@ const Options = require("./Options");
 const Field = require("./Field");
 
 module.exports = class BoolField extends Field {
-  constructor(){
-    super();
-    this.required = true;
-    this.is = true;
-  }
+  required = true;
+  is = true;
 
   requireTrue(){
     this.is = true;

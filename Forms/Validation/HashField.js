@@ -4,27 +4,23 @@ const crypto = require("crypto");
 const _ = Symbol("private");
 
 module.exports = class HashField extends TextField{
-  constructor(){
-    super();
-    this[_] = {
-      secret: 'foo',
-      algo: 'sha256',
-      encoding: 'hex'
-    };
-  }
+
+  #secret = "foo";
+  #algo = "sha256";
+  #encoding = "hex";
 
   withSecret(secret){
-    this[_].secret = secret;
+    this.#secret = secret;
     return this;
   }
 
   withAlgorithm(algo){
-    this[_].algo = algo;
+    this.#algo = algo;
     return this;
   }
 
   withEncoding(enc){
-    this[_].encoding = enc;
+    this.#encoding = enc;
     return this;
   }
 

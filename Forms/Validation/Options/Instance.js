@@ -1,10 +1,8 @@
 const Option = require("./Option");
 
 module.exports = class Instance extends Option {
-  constructor(){
-    super();
-    this.isInstanceOf = null;
-  }
+
+  isInstanceOf = null;
 
   isValid(value){
     if(this.isInstanceOf !== null){

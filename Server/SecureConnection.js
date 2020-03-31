@@ -4,6 +4,9 @@ const fs = require("fs");
 const _ = Symbol("private");
 
 module.exports = class SecureConnection extends Connection {
+  #key = '';
+  #cert = '';
+
   /**
    * @param {number} port
    * @param {function} handler
@@ -11,11 +14,9 @@ module.exports = class SecureConnection extends Connection {
    */
   constructor(port, handler, certs) {
     super(port, handler);
-    this[_] = {
-      key: fs.readFileSync(certs.key),
-      cert: fs.readFileSync(certs.cert)
-    };
-  }
+    this.#key= fs.readFileSync(certs.key),
+    this.#cert = fs.readFileSync(certs.cert)
+  };
 
   /**
    * Start listening for connections.
@@ -26,6 +27,6 @@ module.exports = class SecureConnection extends Connection {
     if(!onListening){
       onListening = ()=>{console.log(`Secure Connection created on port: ${this.port}`)};
     }
-    this.setServer(https.createServer({key: this[_].key, cert: this[_].cert}, this.handler), onListening);
+    this.setServer(https.createServer({key: this.#key, cert: this.#cert}, this.#handler), onListening);
   }
 };

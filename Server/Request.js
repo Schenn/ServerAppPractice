@@ -3,7 +3,6 @@ const StringDecoder = require("string_decoder").StringDecoder;
 const qs = require("querystring");
 const Autoloader = require("../Server/Autoloader");
 
-const _ = Symbol("private");
 const methods = {
   "get": "GET",
   "put": "PUT",
@@ -16,19 +15,22 @@ const methods = {
  * @type {module.Request}
  */
 module.exports = class Request {
+
+  #req = null;
+  #isSecure = false;
+  #decoder = new StringDecoder('utf-8');
+  #parsedUrl = {};
+  #payload = "";
+  #dependencies = {};
+
   /**
    * @param req
    * @param {boolean} secure
    */
   constructor(req, secure = false){
-    this[_] = {
-      req: req,
-      isSecure: secure,
-      decoder: new StringDecoder('utf-8'),
-      parsedUrl: url.parse(req.url, true),
-      payload: '',
-      dependencies: {}
-    };
+    this.#req = req;
+    this.#isSecure = secure;
+    this.#parsedUrl = url.parse(req.url, true);
   }
 
   static get METHODS(){
@@ -36,7 +38,7 @@ module.exports = class Request {
   }
 
   get METHODS(){
-    return this.constructor.METHODS;
+    return methods;
   }
 
   /**
@@ -45,7 +47,7 @@ module.exports = class Request {
    * @return {boolean}
    */
   get isSecure(){
-    return this[_].isSecure;
+    return this.#isSecure;
   }
 
   /**
@@ -54,7 +56,7 @@ module.exports = class Request {
    * @return {string | *}
    */
   get path(){
-    return this[_].parsedUrl.pathname.replace(/^(\/+)|(\/$)/g , '');
+    return this.#parsedUrl.pathname.replace(/^(\/+)|(\/$)/g , '');
   }
 
   /**
@@ -63,7 +65,7 @@ module.exports = class Request {
    * @return {*}
    */
   get query(){
-    return this[_].parsedUrl.query;
+    return this.#parsedUrl.query;
   }
 
   /**
@@ -71,7 +73,7 @@ module.exports = class Request {
    * @return {*}
    */
   get httpMethod(){
-    return this[_].req.method;
+    return this.#req.method;
   }
 
   /**
@@ -79,7 +81,7 @@ module.exports = class Request {
    * @return {*|ResponseHeaders|Array}
    */
   get headers(){
-    return this[_].req.headers;
+    return this.#req.headers;
   }
 
   /**
@@ -87,7 +89,7 @@ module.exports = class Request {
    * @return {*|null}
    */
   get payload(){
-    return this[_].payload;
+    return this.#payload;
   }
 
   /**
@@ -97,17 +99,17 @@ module.exports = class Request {
    * @param {function} onReady
    */
   init(onReady){
-    this[_].req.on('data', (data)=>{
-      this[_].payload += this[_].decoder.write(data);
+    this.#req.on('data', (data)=>{
+      this.#payload += this.#decoder.write(data);
     });
-    this[_].req.on('end', ()=>{
-      this[_].payload += this[_].decoder.end();
-      switch(this[_].req.headers['content-type']){
+    this.#req.on('end', ()=>{
+      this.#payload += this.#decoder.end();
+      switch(this.#req.headers['content-type']){
         case 'application/json':
-          this[_].payload = JSON.parse(this[_].payload);
+          this.#payload = JSON.parse(this.#payload);
           break;
         case 'multipart/form-data':
-          this[_].payload = qs.parse(this[_].payload);
+          this.#payload = qs.parse(this.#payload);
           break;
         default:
           // leave it alone
