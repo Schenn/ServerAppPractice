@@ -1,7 +1,7 @@
 /**
- * @type {module.User}
+ * @type {User}
  */
-module.exports = class User {
+class User {
 
   userName = "";
   #email = "";
@@ -33,4 +33,6 @@ module.exports = class User {
   set password(password){
     this.#password = password;
   }
-};
+}
+
+module.exports = User;
