@@ -1,9 +1,9 @@
 const path = require("path");
 const env = require("./config");
-const mysqlx = require('@mysql/xdevapi');
 
-const Server = require("./Server/Server");
-const Router = require("./Router/Router");
+const DBX = require("../Database/DBX");
+const Server = require("../Server/Server");
+const Router = require("../Router/Router");
 
 let router = new Router();
 
@@ -11,31 +11,26 @@ const server = new Server();
 server.handler = router.handle.bind(router);
 server.environment = env.env;
 
-/**
- * Open the ports for connections.
- */
-const listen = ()=>{
-  server.createConnection(env.port);
-  if(env.https){
-    server.createConnection(env.https.port, env.https);
-  }
+DBX.addHost("database", process.env.DB_PORT);
+DBX.setUser(process.env.MYSQL_USER, process.env.MYSQL_PASSWORD);
 
-  setTimeout(()=>{
-    let conn = mysqlx.createConnection({host: "database",
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_USER});
+module.exports = ()=>{
 
-    conn.query("SELECT 1 AS success", (err, results, fields)=>{
-      if(err) {throw err;}
-      console.log("Success? : ", results[0].success);
-    });
+  let db = new DBX();
 
-    conn.end();
-  }, 20000);
+  /**
+   * Open the ports for connections.
+   */
+  const listen = ()=>{
+    server.createConnection(env.port);
+    if(env.https){
+      server.createConnection(env.https.port, env.https);
+    }
+  };
 
+  router.buildCache(path.join(process.cwd(),"Controllers")).then((router)=>{
+    db.connect(process.env.MYSQL_DATABASE).then(listen).catch((e)=>{console.log(e);});
+  });
 };
 
-router.buildCache(path.join(process.cwd(),"Controllers")).then((router)=>{
-  listen();
-});
+
