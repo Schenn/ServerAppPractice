@@ -46,6 +46,7 @@ module.exports = class Route {
     }
     this.#method = method.name;
     this.#controllerData = controllerData;
+    this.#routeData = method;
   }
 
   /**
@@ -153,15 +154,17 @@ module.exports = class Route {
    */
   prepareDependencies(req){
     for(let [name, target] of Object.entries(this.#dependsOn)){
+      let data = null;
       if(req.httpMethod === "GET"){
-        this.#dependencies[name] = (req.query === "") ?
-          new target() :
-          new target(req.query);
+        if(req.query !== ""){
+          data = req.query;
+        }
       } else {
-        this.#dependencies[name] = (typeof req.payload[name] !== "undefined") ?
-          new target(req.payload[name]) :
-          new target(req.payload);
+        data = (typeof req.payload[name] !== "undefined") ?
+          req.payload[name] :
+          req.payload;
       }
+      this.#dependencies[name] = (data !== null) ? new target(data) : new target();
     }
   }
 

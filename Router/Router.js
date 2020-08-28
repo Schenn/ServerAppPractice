@@ -5,9 +5,9 @@ const Route = require("./Route");
 /**
  * Handle redirecting routes to class methods.
  *
- * @type {module.Router}
+ * @type {Router}
  */
-module.exports = class Router extends Collector {
+class Router extends Collector {
   #routes = {};
   #before = [];
   #onRoute = {};
@@ -17,7 +17,7 @@ module.exports = class Router extends Collector {
    *
    *  The route is memoized as httpMethod::path.
    *    That way multiple methods can each handle a different http method for a given path.
-   *    (e.g. GET /create -- controller::renderForm. POST /create -- controller::saveForm.)
+   *    (e.g. GET /createTable -- controller::renderForm. POST /createTable -- controller::saveForm.)
    *
    * @param {module.Route} route
    */
@@ -42,9 +42,10 @@ module.exports = class Router extends Collector {
       controllerData.classDoc.annotationFromPhrase(`* @classRoute ${namespace.toLowerCase()}`);
     }
 
-    for(let doc of controllerData){
-      if(doc.type === "method" && doc.doc.hasAnnotation("route")){
-        this.addRoute(new Route(controllerData, doc.doc));
+    for(let methodName of controllerData.methods){
+      let meta = controllerData.forMethod(methodName);
+      if(meta.hasAnnotation("route")){
+        this.addRoute(new Route(controllerData, meta));
       }
     }
   }
@@ -154,5 +155,6 @@ module.exports = class Router extends Collector {
     }
     this.#onRoute[route] += cb;
   }
-};
+}
 
+module.exports = Router;

@@ -26,7 +26,7 @@ const testRoutePaths = (route, method, controllerRoute)=>{
   assert.ok(route);
   assert.equal(controllerRoute, route.controllerRoute);
   // For the tests, all "index" methods route to path "/" for their controller.
-  if(methodToRoute === "index"){
+  if(methodToRoute === "App.index.index"){
     assert.equal("/", route.subpath);
     let path = (controllerRoute !== "/") ?
       `${controllerRoute}/` :
