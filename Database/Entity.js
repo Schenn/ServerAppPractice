@@ -1,3 +1,4 @@
+const EntityManager = require("EntityManager");
 /**
  * Entity is the master wrapper for the components it contains
  * The components it contains may vary over time.
@@ -23,12 +24,17 @@
  *
  */
 class Entity {
+  static #manager = EntityManager;
   #id = -1;
-  #name = "";
+  #name = '';
   #components = new WeakMap();
   #events = new WeakMap();
-  #entityManager;
 
+  /**
+   * @DBX/Column {int}
+   * @DBX/PrimaryKey
+   * @return {number}
+   */
   get id(){
     return this.#id;
   }
@@ -37,13 +43,14 @@ class Entity {
     return this.#name;
   }
 
-  constructor(entityManager, name=""){
+  constructor(name = ""){
     this.#name = name ? name : new.target.constructor.name;
-    this.#entityManager = entityManager;
   }
 
   /**
-   * A component is a standalone block of functionality which the Entity won't be destroyed by when altered.
+   * A component is a standalone block of functionality that needs to store its own data.
+   *  Joined on one-to-many tables using class names or aliases as the table name.
+   *  Uses "id" as the primary key. Joins are done on ids
    *  An Entity communicates with the component via "messaging" methods and event handlers.
    *
    * @param component

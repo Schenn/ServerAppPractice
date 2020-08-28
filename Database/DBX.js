@@ -58,7 +58,15 @@ class DBX {
   #connection = null;
   #poolClient = null;
   #activeTransaction = false;
+  /**
+   *
+   * @type {Schema | null}
+   */
   #schema = null;
+
+  #tryCount = 0;
+  #tryMax = 3;
+  #tryOut;
 
   static addHost(host, port, priority = -1){
     DBX.#hosts.push({name:host, port: port, priority: priority});
@@ -78,6 +86,10 @@ class DBX {
 
   static setPooling(idle, size, timeout){
     DBX.setConnectionAttribute('pooling', {enabled: true, maxIdleTime: idle, maxSize: size, queueTimeout: timeout});
+  }
+
+  static get pools(){
+    return DBX.#connAtts && DBX.#connAtts.pooling;
   }
 
   static dnsString(dbName){
@@ -100,10 +112,11 @@ class DBX {
     return this.#connection;
   }
 
+
   /**
    *
    * @param dbName Pass nothing to get the default schema
-   * @return {module:Schema|Schema|module:Schema}
+   * @return {Schema}
    */
   getDB(dbName){
     return this.#connection.getSchema(dbName);
@@ -119,8 +132,7 @@ class DBX {
   connect(dbName = ''){
     let dns = DBX.dnsString(dbName);
     return new Promise((resolve, reject)=>{
-      // If we're pooling, we need to use the pool client.
-      if(DBX.#connAtts && DBX.#connAtts.pooling){
+      const usePool = ()=>{
         this.#poolClient = mysqlx.getClient(dns, DBX.#connAtts);
         this.#poolClient.getSession.then(session => {
           this.#connection = session;
@@ -129,20 +141,42 @@ class DBX {
           }
           resolve(this);
         }).catch(reject);
-      } else {
+      };
+
+      const tryAgain = (err)=>{
+        if(++this.#tryCount < this.#tryMax){
+          console.log(`Failed to connect to DB. Trying again in 20 seconds. ${err.message}`);
+          this.#tryOut = setTimeout(checkDb, 20000);
+        } else {
+          throw new Error("Unable to connect to DB.");
+        }
+      };
+      const checkDb = ()=>{
         mysqlx.getSession(dns)
           .then(session => {
+            this.#tryCount = this.#tryMax;
+            clearTimeout(this.#tryOut);
             this.#connection = session;
             if(dbName){
               this.currentDB = dbName;
             }
             resolve (this);
-          }).catch(reject);
+          }).catch(tryAgain);
+      };
+      // If we're pooling, we need to use the pool client.
+      if(DBX.pools){
+        usePool();
+      } else {
+        checkDb();
       }
 
       // After all the then's are processed, close the pool client.
     }).finally(()=>{if(this.#poolClient){this.#poolClient.close()}});
 
+  }
+
+  tableExists(tableName){
+    return !!this.#schema.getTable(tableName);
   }
 
   startTransaction(){

@@ -1,14 +1,14 @@
 class Component {
   #name = "";
-  #onPropChange = null;
-  #entity = null;
-  #initializing = true;
+  #id = -1;
 
-  constructor(entity, onPropChange=()=>{}){
-    this.#entity = entity;
-    this.#onPropChange = onPropChange;
+  get id(){
+    return this.#id;
   }
 
+  constructor({id=-1}) {
+    this.#id = id;
+  }
 
 }
 
