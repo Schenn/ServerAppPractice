@@ -6,7 +6,7 @@ const Response = require("./Response");
  *  When a request is heard, the path is translated into
  *    /controllername/[function][request method]
  *
- *  For example:  if you Post to "users/create", the "createPost" method for the Users controller will be called.
+ *  For example:  if you Post to "users/createTable", the "createPost" method for the Users controller will be called.
  *
  *  If there is only one part of the path (e.g. foo), than the app
  *    checks for the corresponding index function on the appropriate controller class.

@@ -27,6 +27,6 @@ module.exports = class SecureConnection extends Connection {
     if(!onListening){
       onListening = ()=>{console.log(`Secure Connection created on port: ${this.port}`)};
     }
-    this.setServer(https.createServer({key: this.#key, cert: this.#cert}, this.#handler), onListening);
+    this.setServer(https.createServer({key: this.#key, cert: this.#cert}, this.handler), onListening);
   }
 };

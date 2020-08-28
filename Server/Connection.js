@@ -3,7 +3,7 @@ const fs = require("fs");
 
 module.exports = class Connection {
   #port = '';
-  #handler = ()=>{};
+  #onRequest = ()=>{};
   #server = null;
 
   /**
@@ -12,11 +12,11 @@ module.exports = class Connection {
    */
   constructor(port, handler=(req, res)=>{console.log("Heard Request.");}) {
     this.#port = port;
-    this.#handler = handler;
+    this.#onRequest = handler;
   }
 
   get handler(){
-    return this.#handler;
+    return this.#onRequest;
   }
 
   /**
@@ -44,6 +44,6 @@ module.exports = class Connection {
       };
     }
 
-    this.setServer(http.createServer(this.#handler), onListening);
+    this.setServer(http.createServer(this.#onRequest), onListening);
   }
 };
