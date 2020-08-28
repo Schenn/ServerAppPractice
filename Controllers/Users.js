@@ -19,7 +19,7 @@ module.exports = class Users extends Controller {
   }
 
   /**
-   * @route create
+   * @route createTable
    * @httpMethod post
    * @json
    * @depends {Forms/NewUser} newuserform
@@ -32,10 +32,10 @@ module.exports = class Users extends Controller {
     } else {
       let user = newuserform.Model;
       // Make sure user doesn't already exist.
-
+      console.log(user);
       // If the user exists, update the entry
 
-      // Otherwise, create it.
+      // Otherwise, createTable it.
       console.log("Save the user!");
 
     }
