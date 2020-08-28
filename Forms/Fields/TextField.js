@@ -3,10 +3,9 @@ const Options = require("./Options");
 
 module.exports = class TextField extends Field{
 
-  required = true;
   fieldOpts = {
     "length": {option: Options.Size, props: {useLength:true}},
-    "pattern": {option: Options.Pattern}
+    "pattern": {option: Options.Pattern, props:{}}
   };
 
   set maxLength(maxLength){
@@ -18,6 +17,6 @@ module.exports = class TextField extends Field{
   }
 
   set pattern(pattern){
-    this.getOption("type").pattern = pattern;
+    this.getOption("pattern").pattern = pattern;
   }
 };

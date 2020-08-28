@@ -1,5 +1,4 @@
 const Required = require("./Options/Required");
-const _ = Symbol("private");
 
 module.exports = class Field {
 
@@ -8,37 +7,30 @@ module.exports = class Field {
   value = "";
   label = "";
   error = "";
+  required = false;
   fieldOpts = {};
   #options = new Map();
 
   constructor(name, label){
     this.name = name;
     this.label = label;
-    this.initOptions();
-  }
-
-  set required(required){
-    if(required && typeof this.#options.required === "undefined"){
-      // If setting to true, and not already, make required.
-      this.#options.required = new Required();
-    } else if (!required && typeof this.#options.required !== "undefined") {
-      // If setting to false, and currently true, unrequire.
-      delete this.#options.required;
-    }
   }
 
   addOption(optionName, option){
     let target = new option.option();
     if(typeof option.props !== "undefined"){
-      for(let arg in option.props){
+      for(let arg of Object.keys(option.props)){
         target[arg] = option.props[arg];
       }
     }
     this.#options.set(optionName, target);
   }
 
-  initOptions(){
-    for(let opt in this.fieldOpts) {
+  initOptions(props){
+    for(let opt of Object.keys(this.fieldOpts)) {
+      if(typeof props[opt] !== "undefined"){
+        Object.assign(this.fieldOpts[opt].props, props[opt]);
+      }
       this.addOption(opt, this.fieldOpts[opt]);
     }
   }
@@ -51,18 +43,22 @@ module.exports = class Field {
     return `<label for="${this.name}">${this.label}</label>`;
   }
 
+  optionsAsAttributes(){
+    return Array.from(this.#options.values()).map((opt)=>{
+      return opt.asAttribute();
+    }).join(' ');
+  }
+
   /**
    * @abstract
    */
   get html() {
-    let inputHtml = `
-      <input type="${this.type}" name="${this.name}" value="${this.value}"
-      ${this.required ? "required" : ''}
-      ${Array.from(this.#options.values()).map((opt)=>{
-        return opt.asAttribute();
-    })}
+    return `
+      <input type="${this.type}" name="${this.name}" 
+      ${this.value !== "" ? `value="${this.value}"` : ''}
+      ${this.required ? 'required' : ''}
+      ${this.optionsAsAttributes()}
       />`;
-    throw new Error(`Abstract Property Called. ${this.constructor.name} Needs HTML`);
   }
 
   isValid(){
