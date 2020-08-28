@@ -4,9 +4,18 @@ const _ = Symbol("private");
 module.exports = class Field {
 
   name = "";
+  type = "";
   value = "";
   label = "";
+  error = "";
+  fieldOpts = {};
   #options = new Map();
+
+  constructor(name, label){
+    this.name = name;
+    this.label = label;
+    this.initOptions();
+  }
 
   set required(required){
     if(required && typeof this.#options.required === "undefined"){
@@ -20,17 +29,17 @@ module.exports = class Field {
 
   addOption(optionName, option){
     let target = new option.option();
-    if(typeof option.args !== "undefined"){
-      for(let arg in option.args){
-        target[arg] = option.args[arg];
+    if(typeof option.props !== "undefined"){
+      for(let arg in option.props){
+        target[arg] = option.props[arg];
       }
     }
     this.#options.set(optionName, target);
   }
 
-  initOptions(options){
-    for(let opt in options) {
-      this.addOption(opt, options[opt]);
+  initOptions(){
+    for(let opt in this.fieldOpts) {
+      this.addOption(opt, this.fieldOpts[opt]);
     }
   }
 
@@ -38,20 +47,34 @@ module.exports = class Field {
     return this.#options.get(opt);
   }
 
+  get labelHtml(){
+    return `<label for="${this.name}">${this.label}</label>`;
+  }
+
   /**
    * @abstract
    */
   get html() {
+    let inputHtml = `
+      <input type="${this.type}" name="${this.name}" value="${this.value}"
+      ${this.required ? "required" : ''}
+      ${Array.from(this.#options.values()).map((opt)=>{
+        return opt.asAttribute();
+    })}
+      />`;
     throw new Error(`Abstract Property Called. ${this.constructor.name} Needs HTML`);
   }
 
   isValid(){
     let valid;
-    for(let [opt, option] of this.#options){
-      valid = option.isValid(this.value);
-      if(!valid){
-        break;
+    try {
+      for(let option of this.#options.values()){
+          // option throws if its not valid. It doesn't return false.
+          valid = option.isValid(this.value);
       }
+    } catch(e){
+      this.error = e;
+      valid = false;
     }
     return valid;
   }

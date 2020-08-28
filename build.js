@@ -1,6 +1,6 @@
 const path = require("path");
 const RouteCollector = require("./Collectors/RouteCollector.js");
-const Writer = require('./lib/Writer.js');
+const Writer = require('../lib/Writer.js');
 const onDone = (err)=>{
   if(err){
     console.log(err);

@@ -4,8 +4,8 @@ module.exports = class BoolOpt extends Option {
 
   is = true;
 
-  constructor(){
-    super();
+  asAttribute(){
+    return ``;
   }
 
   isValid(value){

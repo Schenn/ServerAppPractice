@@ -1,5 +1,3 @@
-const _ = Symbol("private");
-
 /**
  * @type {module.User}
  */

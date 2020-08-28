@@ -3,5 +3,5 @@ module.exports = {
   Instance: require("./Instance"),
   Required: require("./Required"),
   Size: require("./Size"),
-  Text: require("./Text")
+  Pattern: require("./Pattern")
 };

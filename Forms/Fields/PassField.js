@@ -1,13 +1,12 @@
 const TextField = require("./TextField");
 const crypto = require("crypto");
 
-const _ = Symbol("private");
-
-module.exports = class HashField extends TextField{
+module.exports = class PassField extends TextField{
 
   #secret = "foo";
   #algo = "sha256";
   #encoding = "hex";
+  required = true;
 
   withSecret(secret){
     this.#secret = secret;
@@ -24,15 +23,13 @@ module.exports = class HashField extends TextField{
     return this;
   }
 
-  set value(value){
-    super.value = value;
+  get encodedValue(){
+    let value = this.value;
+    let ret = null;
+    if(typeof value !== "undefined" && value.length === 0){
+      ret = crypto.createHmac(this.#algo, this.#secret).update(value).digest(this.#encoding);
+    }
+    return ret;
   }
 
-  get value(){
-    let value = super.value;
-    if(typeof value === "undefined" || value.length === 0){
-      return false;
-    }
-    return crypto.createHmac(this[_].algo, this[_].secret).update(value).digest(this[_].encoding);
-  }
 };
